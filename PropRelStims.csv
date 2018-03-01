@@ -1,0 +1,372 @@
+target,eventivity,SubjectRel,Whose,TaskType,TaskPredicateRel,TaskObjectRel,Task1,Task2,Spillover,Answer
+ambush,Ev,Tran,Samir,Sentence,None,None,ambushes are easy to see coming,,,1
+arrest,Ev,Tran,Samir,Sentence,None,None,arrests go on one's record,,,2
+assault,Ev,Tran,Samir,Sentence,None,None,assaults are crimes,,,2
+auction,Ev,Tran,Samir,Sentence,None,None,auctions are a way to raise money,,,2
+audit,Ev,Tran,Samir,Sentence,None,None,audits are tryouts,,,1
+boycott,Ev,Tran,Samir,Sentence,None,None,boycotts are methods of protest,,,2
+brawl,Ev,Intr,Samir,Sentence,None,None,brawls in bars are safe for children,,,1
+bribe,Ev,Tran,Samir,Sentence,None,None,bribes can be efficient solutions,,,2
+clash,Ev,Intr,Samir,Sentence,None,None,clashes between militaries can start a war,,,2
+collapse,Ev,Intr,Samir,Sentence,None,None,collapses of economies are disastrous,,,2
+dance,Ev,Intr,Samir,Sentence,None,None,dances are patterns of movements,,,2
+disgrace,Ev,Tran,Samir,Sentence,None,None,disgraces are something to brag about,,,1
+divorce,Ev,Tran,Samir,Sentence,None,None,divorces always cause joy,,,1
+dream,Ev,Intr,Samir,Sentence,None,None,dreams happen in real life,,,1
+eclipse,Ev,Tran,Samir,Sentence,None,None,eclipses are astronomical events,,,2
+experiment,Ev,Intr,Samir,Sentence,None,None,experiments are always successful,,,1
+fall,Ev,Intr,Samir,Sentence,None,None,falls are likely on icy ground,,,2
+feast,Ev,Intr,Samir,Sentence,None,None,feasts have very little food,,,1
+fuss,Ev,Intr,Samir,Sentence,None,None,fusses often involves complaining,,,2
+insult,Ev,Tran,Samir,Sentence,None,None,insults are the same as compliments,,,1
+journey,Ev,Intr,Samir,Sentence,None,None,journies can take years,,,2
+march,Ev,Intr,Samir,Sentence,None,None,marches are unorganized walking,,,1
+massacre,Ev,Tran,Samir,Sentence,None,None,massacres are peaceful affairs,,,1
+massage,Ev,Tran,Samir,Sentence,None,None,massages are painful,,,1
+motion,Ev,Intr,Samir,Sentence,None,None,motions involve standing totally still,,,1
+murder,Ev,Tran,Samir,Sentence,None,None,murders will always be solved quickly,,,1
+mutiny,Ev,Intr,Samir,Sentence,None,None,mutinies occur against authority,,,2
+overdose,Ev,Intr,Samir,Sentence,None,None,overdoses are never lethal,,,1
+punch,Ev,Tran,Samir,Sentence,None,None,punches to the face hurt,,,2
+quarantine,Ev,Tran,Samir,Sentence,None,None,quarantines require isolation,,,2
+raid,Ev,Tran,Samir,Sentence,None,None,raids are highly predictable,,,1
+rant,Ev,Intr,Samir,Sentence,None,None,rants are happy speeches,,,1
+remark,Ev,Intr,Samir,Sentence,None,None,remarks can be written or spoken,,,2
+rendezvous,Ev,Intr,Samir,Sentence,None,None,rendezvous are meetings,,,2
+rescue,Ev,Tran,Samir,Sentence,None,None,rescues are exciting to watch,,,2
+rest,Ev,Intr,Samir,Sentence,None,None,rests feel great after a long day of work,,,2
+retreat,Ev,Intr,Samir,Sentence,None,None,retreats signify the end of a battle,,,2
+revolt,Ev,Intr,Samir,Sentence,None,None,revolts reflect well on those in power,,,1
+riot,Ev,Intr,Samir,Sentence,None,None,riots result in property damage,,,2
+scrape,Ev,Tran,Samir,Sentence,None,None,srapes are major medical emergencies,,,1
+scuffle,Ev,Intr,Samir,Sentence,None,None,scuffles are fights at close range,,,2
+serenade,Ev,Tran,Samir,Sentence,None,None,serenades are musical,,,2
+shock,Ev,Tran,Samir,Sentence,None,None,shocks are always pleasant,,,2
+skirmish,Ev,Intr,Samir,Sentence,None,None,skirmishes are friendly conversation,,,1
+slaughter,Ev,Tran,Samir,Sentence,None,None,slaughters are clean events,,,1
+sprint,Ev,Intr,Samir,Sentence,None,None,sprints are longer than endurance races,,,1
+squeal,Ev,Intr,Samir,Sentence,None,None,squeals are low-pitched noises,,,1
+stampede,Ev,Intr,Samir,Sentence,None,None,stampedes can be extremely dangerous,,,2
+surge,Ev,Intr,Samir,Sentence,None,None,surges are a sudden decreases,,,1
+surprise,Ev,Tran,Samir,Sentence,None,None,surprises are unexpected,,,2
+thrill,Ev,Tran,Samir,Sentence,None,None,thrills are boring experiences,,,1
+trend,Ev,Intr,Samir,Sentence,None,None,trends never go out of style,,,1
+trick,Ev,Tran,Samir,Sentence,None,None,a*trick*to*eating*less*is*shopping*while*hungry,,,1
+triumph,Ev,Intr,Samir,Sentence,None,None,triumphs are causes for celebration,,,2
+veto,Ev,Tran,Samir,Sentence,None,None,vetos are approvals,,,1
+vote,Ev,Intr,Samir,Sentence,None,None,votes are a statement of fact,,,1
+waltz,Ev,Intr,Samir,Sentence,None,None,waltzes often danced at wild parties,,,1
+wound,Ev,Tran,Samir,Sentence,None,None,wounds should be properly cleaned,,,2
+wreck,Ev,Tran,Samir,Sentence,None,None,wrecks are the result of a crash,,,2
+ambush,Ev,Tran,Samir,Word,None,None,,,,1
+arrest,Ev,Tran,Samir,Word,None,None,,,,1
+assault,Ev,Tran,Samir,Word,None,None,,,,1
+auction,Ev,Tran,Samir,Word,None,None,,,,2
+audit,Ev,Tran,Samir,Word,None,None,,,,2
+boycott,Ev,Tran,Samir,Word,None,None,,,,1
+brawl,Ev,Intr,Samir,Word,None,None,,,,2
+bribe,Ev,Tran,Samir,Word,None,None,,,,2
+clash,Ev,Intr,Samir,Word,None,None,,,,2
+collapse,Ev,Intr,Samir,Word,None,None,,,,1
+dance,Ev,Intr,Samir,Word,None,None,,,,1
+deposit,Ev,Tran,Samir,Word,None,None,,,,2
+disgrace,Ev,Tran,Samir,Word,None,None,,,,2
+divorce,Ev,Tran,Samir,Word,None,None,,,,2
+dream,Ev,Intr,Samir,Word,None,None,,,,1
+eclipse,Ev,Tran,Samir,Word,None,None,,,,1
+experiment,Ev,Intr,Samir,Word,None,None,,,,1
+fall,Ev,Intr,Samir,Word,None,None,,,,2
+feast,Ev,Intr,Samir,Word,None,None,,,,2
+fuss,Ev,Intr,Samir,Word,None,None,,,,2
+insult,Ev,Tran,Samir,Word,None,None,,,,1
+journey,Ev,Intr,Samir,Word,None,None,,,,1
+march,Ev,Intr,Samir,Word,None,None,,,,1
+massacre,Ev,Tran,Samir,Word,None,None,,,,1
+massage,Ev,Tran,Samir,Word,None,None,,,,2
+motion,Ev,Intr,Samir,Word,None,None,,,,2
+murder,Ev,Tran,Samir,Word,None,None,,,,2
+mutiny,Ev,Intr,Samir,Word,None,None,,,,1
+overdose,Ev,Intr,Samir,Word,None,None,,,,1
+punch,Ev,Tran,Samir,Word,None,None,,,,2
+quarantine,Ev,Tran,Samir,Word,None,None,,,,2
+raid,Ev,Tran,Samir,Word,None,None,,,,1
+rant,Ev,Intr,Samir,Word,None,None,,,,2
+remark,Ev,Intr,Samir,Word,None,None,,,,1
+rendezvous,Ev,Intr,Samir,Word,None,None,,,,1
+rescue,Ev,Tran,Samir,Word,None,None,,,,1
+rest,Ev,Intr,Samir,Word,None,None,,,,2
+retreat,Ev,Intr,Samir,Word,None,None,,,,2
+revolt,Ev,Intr,Samir,Word,None,None,,,,2
+riot,Ev,Intr,Samir,Word,None,None,,,,1
+scrape,Ev,Tran,Samir,Word,None,None,,,,1
+scuffle,Ev,Intr,Samir,Word,None,None,,,,2
+serenade,Ev,Tran,Samir,Word,None,None,,,,1
+shock,Ev,Tran,Samir,Word,None,None,,,,1
+skirmish,Ev,Intr,Samir,Word,None,None,,,,2
+slaughter,Ev,Tran,Samir,Word,None,None,,,,2
+sprain,Ev,Tran,Samir,Word,None,None,,,,2
+sprint,Ev,Intr,Samir,Word,None,None,,,,1
+squeal,Ev,Intr,Samir,Word,None,None,,,,1
+stampede,Ev,Intr,Samir,Word,None,None,,,,2
+surge,Ev,Intr,Samir,Word,None,None,,,,2
+surprise,Ev,Tran,Samir,Word,None,None,,,,2
+survey,Ev,Tran,Samir,Word,None,None,,,,1
+thrill,Ev,Tran,Samir,Word,None,None,,,,1
+trend,Ev,Intr,Samir,Word,None,None,,,,1
+trick,Ev,Tran,Samir,Word,None,None,,,,1
+triumph,Ev,Intr,Samir,Word,None,None,,,,2
+veto,Ev,Tran,Samir,Word,None,None,,,,2
+vote,Ev,Intr,Samir,Word,None,None,,,,2
+waltz,Ev,Intr,Samir,Word,None,None,,,,1
+wound,Ev,Tran,Samir,Word,None,None,,,,1
+wreck,Ev,Tran,Samir,Word,None,None,,,,2
+stories,NoEv,Intr,Adina,Word,None,None,fiction,reality,,1
+animals,NoEv,Intr,Adina,Word,None,None,inanimate,alive,,2
+towns,NoEv,Intr,Adina,Word,None,None,country,urban,,2
+problems,NoEv,Intr,Adina,Word,None,None,trouble,assistance,,1
+rivers,NoEv,Intr,Adina,Word,None,None,truck,boat,,2
+islands,NoEv,Intr,Adina,Word,None,None,land,sea,,2
+palaces,NoEv,Intr,Adina,Word,None,None,ruler,subject,,1
+ladies,NoEv,Intr,Adina,Word,None,None,mister,mistress,,2
+women,NoEv,Intr,Adina,Word,None,None,male,female,,2
+valleys,NoEv,Intr,Adina,Word,None,None,mounds,dips,,2
+creatures,NoEv,Intr,Adina,Word,None,None,plants,animals,,2
+moons,NoEv,Intr,Adina,Word,None,None,saturn,earth,,1
+girls,NoEv,Intr,Adina,Word,None,None,youthful,adult,,1
+men,NoEv,Intr,Adina,Word,None,None,people,animals,,1
+insects,NoEv,Intr,Adina,Word,None,None,wings,fins,,1
+jackets,NoEv,Intr,Adina,Word,None,None,summer,fall,,2
+cottages,NoEv,Intr,Adina,Word,None,None,work,vacation,,2
+kitties,NoEv,Intr,Adina,Word,None,None,domestic,feral,,1
+heros,NoEv,Intr,Adina,Word,None,None,good,evil,,1
+factories,NoEv,Intr,Adina,Word,None,None,manufacture,reclaim,,1
+monuments,NoEv,Intr,Adina,Word,None,None,sand,marble,,2
+goats,NoEv,Intr,Adina,Word,None,None,city,farm,,2
+weapons,NoEv,Intr,Adina,Word,None,None,guns,shirts,,1
+hotels,NoEv,Intr,Adina,Word,None,None,lodging,selling,,1
+districts,NoEv,Intr,Adina,Word,None,None,many,few,,1
+boys,NoEv,Intr,Adina,Word,None,None,orderly,mischievous,,2
+universes,NoEv,Intr,Adina,Word,None,None,small,large,,2
+restaurants,NoEv,Intr,Adina,Word,None,None,food,clothes,,1
+mountains,NoEv,Intr,Adina,Word,None,None,sunken,elevated,,2
+cats,NoEv,Intr,Adina,Word,None,None,fluffy,bald,,1
+streets,NoEv,Intr,Adina,Word,None,None,grassy,paved,,2
+magazines,NoEv,Intr,Adina,Word,None,None,gray,colorful,,2
+windows,NoEv,Intr,Adina,Word,None,None,breakable,sturdy,,1
+tents,NoEv,Intr,Adina,Word,None,None,permanent,transient,,2
+witches,NoEv,Intr,Adina,Word,None,None,shovels,brooms,,2
+infants,NoEv,Intr,Adina,Word,None,None,plump,skinny,,1
+cameras,NoEv,Intr,Adina,Word,None,None,film,paper,,1
+targets,NoEv,Intr,Adina,Word,None,None,cannon,arrow,,2
+devices,NoEv,Intr,Adina,Word,None,None,wood,metal,,2
+angels,NoEv,Intr,Adina,Word,None,None,hurt,protect,,2
+kitchens,NoEv,Intr,Adina,Word,None,None,bake,nap,,1
+biscuits,NoEv,Intr,Adina,Word,None,None,dry,runny,,1
+planets,NoEv,Intr,Adina,Word,None,None,sphere,square,,1
+engines,NoEv,Intr,Adina,Word,None,None,car,horse,,1
+vehicles,NoEv,Intr,Adina,Word,None,None,foot,wheel,,2
+peasants,NoEv,Intr,Adina,Word,None,None,work,relax,,1
+secretaries,NoEv,Intr,Adina,Word,None,None,dictate,type,,2
+chambers,NoEv,Intr,Adina,Word,None,None,enforcement,law,,2
+libraries,NoEv,Intr,Adina,Word,None,None,read,eat,,1
+worlds,NoEv,Intr,Adina,Word,None,None,few,many,,2
+foes,NoEv,Tran,Adina,Word,None,None,conflict,harmony,,1
+sisters,NoEv,Tran,Adina,Word,None,None,guys,gals,,2
+brothers,NoEv,Tran,Adina,Word,None,None,monks,nuns,,2
+mothers,NoEv,Tran,Adina,Word,None,None,adult,adolescent,,1
+sons,NoEv,Tran,Adina,Word,None,None,kid,dad,,1
+bosses,NoEv,Tran,Adina,Word,None,None,underling,foreman,,2
+colleagues,NoEv,Tran,Adina,Word,None,None,employers,compatriots,,2
+nieces,NoEv,Tran,Adina,Word,None,None,female,male,,1
+friends,NoEv,Tran,Adina,Word,None,None,strangers,buds,,2
+parents,NoEv,Tran,Adina,Word,None,None,dentists,guardians,,2
+clients,NoEv,Tran,Adina,Word,None,None,project,cloud,,1
+enemies,NoEv,Tran,Adina,Word,None,None,hatred,apathy,,1
+ages,NoEv,Tran,Adina,Word,None,None,distance,time,,2
+wives,NoEv,Tran,Adina,Word,None,None,skirts,democracy,,1
+locations,NoEv,Tran,Adina,Word,None,None,then,there,,2
+spouses,NoEv,Tran,Adina,Word,None,None,wedding,funeral,,1
+values,NoEv,Tran,Adina,Word,None,None,aesthetics,morality,,2
+students,NoEv,Tran,Adina,Word,None,None,school,church,,1
+prices,NoEv,Tran,Adina,Word,None,None,clothing,money,,2
+audiences,NoEv,Tran,Adina,Word,None,None,movie,flowers,,1
+thieves,NoEv,Tran,Adina,Word,None,None,crime,philanthropy,,1
+passengers,NoEv,Tran,Adina,Word,None,None,bike,train,,2
+interiors,NoEv,Tran,Adina,Word,None,None,garden,home,,2
+customers,NoEv,Tran,Adina,Word,None,None,welcome,scare,,1
+opponents,NoEv,Tran,Adina,Word,None,None,defeat,shake,,1
+victims,NoEv,Tran,Adina,Word,None,None,dogs,injury,,2
+borders,NoEv,Tran,Adina,Word,None,None,ocean,country,,2
+assassins,NoEv,Tran,Adina,Word,None,None,guns,pillows,,1
+citizens,NoEv,Tran,Adina,Word,None,None,vote,lobby,,1
+presidents,NoEv,Tran,Adina,Word,None,None,elected,selected,,1
+heirs,NoEv,Tran,Adina,Word,None,None,fortune,poverty,,1
+candidates,NoEv,Tran,Adina,Word,None,None,job,hobby,,1
+stories,NoEv,Intr,Adina,Sentence,Tran,Tran,thrill,veterans,of hard wars,1
+animals,NoEv,Intr,Adina,Sentence,Tran,Tran,wound,assassins,without provocation,2
+towns,NoEv,Intr,Adina,Sentence,Tran,Tran,bribe,presidents,with petty cash,2
+problems,NoEv,Intr,Adina,Sentence,Tran,Tran,shock,clients,who expected an easy project,1
+palaces,NoEv,Intr,Adina,Sentence,Tran,Tran,surprise,heirs,when they are well-maintaines,2
+ladies,NoEv,Intr,Adina,Sentence,Tran,Tran,divorce ,spouses,when they are in love,2
+women,NoEv,Intr,Adina,Sentence,Tran,Tran,massacre,sons,with knives,2
+creatures,NoEv,Intr,Adina,Sentence,Tran,Tran,ambush,victims,and eat them,1
+insects,NoEv,Intr,Adina,Sentence,Tran,Tran,raid,borders,in large groups,1
+girls,NoEv,Intr,Adina,Sentence,Tran,Tran,veto,prices,that are too high,1
+men,NoEv,Intr,Adina,Sentence,Tran,Tran,boycott,friends,that they get along with,2
+kitties,NoEv,Intr,Adina,Sentence,Tran,Tran,wreck,interiors,with sharp little claws,1
+heros,NoEv,Intr,Adina,Sentence,Tran,Tran,arrest ,thieves,and bring them to the police,1
+factories,NoEv,Intr,Adina,Sentence,Tran,Tran,audit,bosses,once a month,2
+goats,NoEv,Intr,Adina,Sentence,Tran,Tran,rescue,passengers,on commuter trains,2
+libraries,NoEv,Intr,Adina,Sentence,Tran,Tran,deposit,values,in the bank,1
+hotels,NoEv,Intr,Adina,Sentence,Tran,Tran,auction,locations,that they aren't planning to develop,1
+districts,NoEv,Intr,Adina,Sentence,Tran,Tran,quarantine,citizens,who are sick with Ebola,1
+boys,NoEv,Intr,Adina,Sentence,Tran,Tran,insult,sisters,during playtime,1
+restaurants,NoEv,Intr,Adina,Sentence,Tran,Tran,trick,customers,by serving fake food,2
+cats,NoEv,Intr,Adina,Sentence,Tran,Tran,murder,foes,by purring at them,2
+magazines,NoEv,Intr,Adina,Sentence,Tran,Tran,disgrace,candidates,by revealing their secrets,1
+witches,NoEv,Intr,Adina,Sentence,Tran,Tran,slaughter,opponents,by using magic,2
+infants,NoEv,Intr,Adina,Sentence,Tran,Tran,punch,mothers,lightly with their tiny fists,1
+angels,NoEv,Intr,Adina,Sentence,Tran,Tran,serenade,brothers,with beautiful melodies,1
+engines,NoEv,Intr,Adina,Sentence,Tran,Tran,scrape,students,who study mechanical engineering,1
+peasants,NoEv,Intr,Adina,Sentence,Tran,Tran,assault,enemies,with pitchforks,1
+secretaries,NoEv,Intr,Adina,Sentence,Tran,Tran,massage,colleagues,as part of their jobs,2
+veterans,NoEv,Tran,Adina,Sentence,Tran,Tran,rescue,foes,during wartime,2
+assassins,NoEv,Tran,Adina,Sentence,Tran,Tran,massacre,enemies,with speed and efficiency,1
+presidents,NoEv,Tran,Adina,Sentence,Tran,Tran,veto,candidates,that don't agree with them,1
+clients,NoEv,Tran,Adina,Sentence,Tran,Tran,massage,prices,to get better deals,2
+heirs,NoEv,Tran,Adina,Sentence,Tran,Tran,auction,interiors,that are beautifully furnished,1
+spouses,NoEv,Tran,Adina,Sentence,Tran,Tran,divorce ,heirs,without prenuptual agreements,2
+sons,NoEv,Tran,Adina,Sentence,Tran,Tran,boycott,spouses,that are picked by their moms,2
+victims,NoEv,Tran,Adina,Sentence,Tran,Tran,slaughter,assassins,with ease,2
+borders,NoEv,Tran,Adina,Sentence,Tran,Tran,quarantine,victims,who were never sick,2
+prices,NoEv,Tran,Adina,Sentence,Tran,Tran,thrill,clients,no matter how high they are,2
+friends,NoEv,Tran,Adina,Sentence,Tran,Tran,insult,sisters,constantly ,2
+interiors,NoEv,Tran,Adina,Sentence,Tran,Tran,scrape,sons,with sharp wall paper,2
+thieves,NoEv,Tran,Adina,Sentence,Tran,Tran,ambush,citizens,to steal their wallets,1
+bosses,NoEv,Tran,Adina,Sentence,Tran,Tran,deposit,values,in hedge funds,1
+passengers,NoEv,Tran,Adina,Sentence,Tran,Tran,raid,borders,for cheaper transit passes,2
+values,NoEv,Tran,Adina,Sentence,Tran,Tran,shock,thieves,who have no morals,2
+locations,NoEv,Tran,Adina,Sentence,Tran,Tran,trick,passengers,into getting off too soon,2
+citizens,NoEv,Tran,Adina,Sentence,Tran,Tran,arrest,students,who have done nothing wrong,2
+sisters,NoEv,Tran,Adina,Sentence,Tran,Tran,punch,brothers,in the arms,1
+customers,NoEv,Tran,Adina,Sentence,Tran,Tran,audit,colleagues,before purchasing anything,2
+foes,NoEv,Tran,Adina,Sentence,Tran,Tran,wound,bosses,with rumors and lies,1
+candidates,NoEv,Tran,Adina,Sentence,Tran,Tran,murder,presidents,to get into office sooner,2
+opponents,NoEv,Tran,Adina,Sentence,Tran,Tran,surprise,veterans,in the hospitals,2
+mothers,NoEv,Tran,Adina,Sentence,Tran,Tran,bribe,customers,with promises of rebates,2
+brothers,NoEv,Tran,Adina,Sentence,Tran,Tran,serenade,mothers,with beautiful ballads,1
+students,NoEv,Tran,Adina,Sentence,Tran,Tran,wreck,locations,with their filthy habits,1
+enemies,NoEv,Tran,Adina,Sentence,Tran,Tran,assault,opponents,in armed conflict,1
+colleagues,NoEv,Tran,Adina,Sentence,Tran,Tran,disgrace,friends,with their poor behavior,1
+stories,NoEv,Intr,Adina,Sentence,Intr,None,trend,,on facebook,1
+animals,NoEv,Intr,Adina,Sentence,Intr,None,retreat,,into the forests,1
+towns,NoEv,Intr,Adina,Sentence,Intr,None,feast,,when they had poor harvests,2
+problems,NoEv,Intr,Adina,Sentence,Intr,None,collapse,,under serious scrutiny,2
+palaces,NoEv,Intr,Adina,Sentence,Intr,None,fall,,in earthquakes,1
+ladies,NoEv,Intr,Adina,Sentence,Intr,None,riot,,in the streets,2
+women,NoEv,Intr,Adina,Sentence,Intr,None,overdose,,on lethal drugs,1
+creatures,NoEv,Intr,Adina,Sentence,Intr,None,stampede,,over cliffs,1
+insects,NoEv,Intr,Adina,Sentence,Intr,None,journey,,for food,1
+girls,NoEv,Intr,Adina,Sentence,Intr,None,waltz,,at school,2
+men,NoEv,Intr,Adina,Sentence,Intr,None,mutiny,,when they are content,2
+kitties,NoEv,Intr,Adina,Sentence,Intr,None,scuffle,,over feathers,1
+heros,NoEv,Intr,Adina,Sentence,Intr,None,march,,for justice,1
+factories,NoEv,Intr,Adina,Sentence,Intr,None,experiment,,with new  procedures,1
+goats,NoEv,Intr,Adina,Sentence,Intr,None,squeal,,on farms,1
+libraries,NoEv,Intr,Adina,Sentence,Intr,None,clash,,with schools over funding,2
+hotels,NoEv,Intr,Adina,Sentence,Intr,None,surge,,in popularity,2
+districts,NoEv,Intr,Adina,Sentence,Intr,None,vote,,on resolutions,1
+boys,NoEv,Intr,Adina,Sentence,Intr,None,skirmish,,with heavy weaponry,2
+restaurants,NoEv,Intr,Adina,Sentence,Intr,None,triumph,,over health inspectors,2
+cats,NoEv,Intr,Adina,Sentence,Intr,None,sprint,,after mice,1
+magazines,NoEv,Intr,Adina,Sentence,Intr,None,rant,,about celebrities,1
+witches,NoEv,Intr,Adina,Sentence,Intr,None,dance,,under the moon,1
+infants,NoEv,Intr,Adina,Sentence,Intr,None,fuss,,in the morning,1
+angels,NoEv,Intr,Adina,Sentence,Intr,None,dream,,of heaven,1
+engines,NoEv,Intr,Adina,Sentence,Intr,None,rest,,when the car is off,1
+peasants,NoEv,Intr,Adina,Sentence,Intr,None,revolt,,because of taxes,1
+secretaries,NoEv,Intr,Adina,Sentence,Intr,None,remark,,on the secrets of their employers,2
+foes,NoEv,Tran,Adina,Sentence,Intr,None,revolt,,against good treatment,2
+enemies,NoEv,Tran,Adina,Sentence,Intr,None,riot,,when provoked,1
+candidates,NoEv,Tran,Adina,Sentence,Intr,None,experiment,,during important campaigns,2
+prices,NoEv,Tran,Adina,Sentence,Intr,None,fall,,every day,2
+interiors,NoEv,Tran,Adina,Sentence,Intr,None,trend,,with home designers,1
+heirs,NoEv,Tran,Adina,Sentence,Intr,None,feast,,on expensive dishes,1
+spouses,NoEv,Tran,Adina,Sentence,Intr,None,clash,,over bills,1
+assassins,NoEv,Tran,Adina,Sentence,Intr,None,waltz,,very well,2
+victims,NoEv,Tran,Adina,Sentence,Intr,None,triumph,,over perpetrators,2
+clients,NoEv,Tran,Adina,Sentence,Intr,None,dream,,of paying more,2
+sisters,NoEv,Tran,Adina,Sentence,Intr,None,sprint,,in the classroom,2
+sons,NoEv,Tran,Adina,Sentence,Intr,None,squeal,,when they turn 18 years old,2
+citizens,NoEv,Tran,Adina,Sentence,Intr,None,retreat,,when they are winning,2
+values,NoEv,Tran,Adina,Sentence,Intr,None,surge,,because of inflation,1
+borders,NoEv,Tran,Adina,Sentence,Intr,None,collapse,,during wartime,1
+thieves,NoEv,Tran,Adina,Sentence,Intr,None,mutiny,,against their guilds,2
+passengers,NoEv,Tran,Adina,Sentence,Intr,None,journey,,on trains all the time,1
+colleagues,NoEv,Tran,Adina,Sentence,Intr,None,rant,,about their treatment,1
+brothers,NoEv,Tran,Adina,Sentence,Intr,None,scuffle,,over toys,1
+bosses,NoEv,Tran,Adina,Sentence,Intr,None,dance,,in front of their workers,2
+students,NoEv,Tran,Adina,Sentence,Intr,None,stampede,,onto campus when school starts,1
+presidents,NoEv,Tran,Adina,Sentence,Intr,None,overdose,,constantly ,2
+veterans,NoEv,Tran,Adina,Sentence,Intr,None,rest,,after their service,1
+customers,NoEv,Tran,Adina,Sentence,Intr,None,remark ,,on how much everything costs,1
+mothers,NoEv,Tran,Adina,Sentence,Intr,None,fuss,,over their babies,1
+locations,NoEv,Tran,Adina,Sentence,Intr,None,skirmish,,from time to time,1
+opponents,NoEv,Tran,Adina,Sentence,Intr,None,vote,,for you always,2
+friends,NoEv,Tran,Adina,Sentence,Intr,None,march,,next to you,1
+stories,NoEv,Intr,Adina,Sentence,Tran,Intr,trick,boys,with their false truths,2
+animals,NoEv,Intr,Adina,Sentence,Tran,Intr,raid,libraries,in search of food,2
+towns,NoEv,Intr,Adina,Sentence,Tran,Intr,quarantine,peasants,during epidemics,1
+problems,NoEv,Intr,Adina,Sentence,Tran,Intr,wreck,factories,every year,1
+palaces,NoEv,Intr,Adina,Sentence,Tran,Intr,disgrace,towns,because they are ugly,2
+ladies,NoEv,Intr,Adina,Sentence,Tran,Intr,audit,hotels,during tax time,1
+women,NoEv,Intr,Adina,Sentence,Tran,Intr,boycott,restaurants,every time they visit them,2
+creatures,NoEv,Intr,Adina,Sentence,Tran,Intr,wound,goats,when they hunt them,1
+insects,NoEv,Intr,Adina,Sentence,Tran,Intr,ambush,palaces,while looking for food,1
+girls,NoEv,Intr,Adina,Sentence,Tran,Intr,slaughter,insects,just for fun,2
+men,NoEv,Intr,Adina,Sentence,Tran,Intr,divorce ,angels,all too often,2
+kitties,NoEv,Intr,Adina,Sentence,Tran,Intr,serenade,ladies,when they're hungry,1
+heros,NoEv,Intr,Adina,Sentence,Tran,Intr,punch,witches,with great force,2
+factories,NoEv,Intr,Adina,Sentence,Tran,Intr,thrill,girls,who love engineering,1
+goats,NoEv,Intr,Adina,Sentence,Tran,Intr,scrape,men,with their horns,1
+libraries,NoEv,Intr,Adina,Sentence,Tran,Intr,auction,engines,off for a high price,2
+hotels,NoEv,Intr,Adina,Sentence,Tran,Intr,bribe,secretaries,to report false earnings,1
+districts,NoEv,Intr,Adina,Sentence,Tran,Intr,arrest,women,who commit crimes,1
+boys,NoEv,Intr,Adina,Sentence,Tran,Intr,deposit,magazines,on doorsteps ,1
+restaurants,NoEv,Intr,Adina,Sentence,Tran,Intr,surprise,infants,with high quality dishes,1
+cats,NoEv,Intr,Adina,Sentence,Tran,Intr,rescue,heros,from drowning,2
+magazines,NoEv,Intr,Adina,Sentence,Tran,Intr,insult,stories,about their funding sources,1
+witches,NoEv,Intr,Adina,Sentence,Tran,Intr,massacre,districts,of people for their dark rituals,1
+infants,NoEv,Intr,Adina,Sentence,Tran,Intr,assault,creatures,with their crying,1
+angels,NoEv,Intr,Adina,Sentence,Tran,Intr,massage,animals,very frequently,2
+engines,NoEv,Intr,Adina,Sentence,Tran,Intr,shock,kitties,that sit on top of them,1
+peasants,NoEv,Intr,Adina,Sentence,Tran,Intr,murder,cats,because they eat rats,2
+secretaries,NoEv,Intr,Adina,Sentence,Tran,Intr,veto,problems,employers put on their plates,2
+foes,NoEv,Tran,Adina,Sentence,Tran,Intr,wreck,hotels,to collect insurance money,2
+enemies,NoEv,Tran,Adina,Sentence,Tran,Intr,raid,palaces,in search of gold,1
+candidates,NoEv,Tran,Adina,Sentence,Tran,Intr,divorce,boys,who can't finance campaigns,1
+prices,NoEv,Tran,Adina,Sentence,Tran,Intr,trick,ladies,with high credit limits,1
+interiors,NoEv,Tran,Adina,Sentence,Tran,Intr,thrill,men ,with good fashion sense,1
+heirs,NoEv,Tran,Adina,Sentence,Tran,Intr,bribe,angels,for their salvation,2
+spouses,NoEv,Tran,Adina,Sentence,Tran,Intr,punch,animals,that attack their homes,1
+assassins,NoEv,Tran,Adina,Sentence,Tran,Intr,ambush,women,walking alone in the woods,1
+victims,NoEv,Tran,Adina,Sentence,Tran,Intr,massage,girls,who leave good tips,1
+clients,NoEv,Tran,Adina,Sentence,Tran,Intr,veto,towns,with high standard of living,2
+sisters,NoEv,Tran,Adina,Sentence,Tran,Intr,murder,secretaries,on business trips,2
+sons,NoEv,Tran,Adina,Sentence,Tran,Intr,scrape,engines,to remove the grease,1
+citizens,NoEv,Tran,Adina,Sentence,Tran,Intr,boycott,problems,with their pensions,1
+values,NoEv,Tran,Adina,Sentence,Tran,Intr,disgrace,witches,with no moral compass,1
+borders,NoEv,Tran,Adina,Sentence,Tran,Intr,shock,peasants,trying to flee wars,1
+thieves,NoEv,Tran,Adina,Sentence,Tran,Intr,massacre,goats,in the mountains,2
+passengers,NoEv,Tran,Adina,Sentence,Tran,Intr,insult,kitties,in carrying cases,1
+colleagues,NoEv,Tran,Adina,Sentence,Tran,Intr,arrest,magazines,in waiting rooms,1
+brothers,NoEv,Tran,Adina,Sentence,Tran,Intr,serenade,infants,to lull them to sleep,1
+bosses,NoEv,Tran,Adina,Sentence,Tran,Intr,auction,restaurants,to the highest bidder,1
+students,NoEv,Tran,Adina,Sentence,Tran,Intr,deposit,insects,in the pockets of teachers,1
+presidents,NoEv,Tran,Adina,Sentence,Tran,Intr,quarantine,districts,for political reasons,2
+veterans,NoEv,Tran,Adina,Sentence,Tran,Intr,audit,factories,on a monthly basis,2
+customers,NoEv,Tran,Adina,Sentence,Tran,Intr,slaughter,cats,to get discounts,2
+mothers,NoEv,Tran,Adina,Sentence,Tran,Intr,disgrace,libraries,with loud yelling,1
+locations,NoEv,Tran,Adina,Sentence,Tran,Intr,surprise,creatures,hunting for dinner,2
+opponents,NoEv,Tran,Adina,Sentence,Tran,Intr,wound,heros,with kryptonite,1
+friends,NoEv,Tran,Adina,Sentence,Tran,Intr,rescue,stories,by editing them,1
