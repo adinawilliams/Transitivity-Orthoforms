@@ -23,6 +23,7 @@ nounsonly=nouns[nouns.Categories=="['noun']"] # this allows us to pull out words
 nouns_count = nounsonly[nounsonly.Ncount==True]
 nouns_count_only = nouns_count[nounsonly.Nmass==False]
 nouns_count_only['rel_type']='norel'
+nouns_count_only['rel_bin']=0
 
 ## VERBS ##
 verbs=df[df.Vfreq!=0]
