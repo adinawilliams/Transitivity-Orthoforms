@@ -9,6 +9,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import datasets, linear_model
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
+
 
 #########################################
 #  This script requires data that was   #
@@ -21,32 +24,56 @@ from sklearn.model_selection import train_test_split
 
 
 
-def runMultiNomClass(traindata, testdata, print_testall): # takes two pandas df and a bool
+def runMultiNomClass(traindata, testdata, print_testall, print_stats, print_sel): # takes two pandas df and a bool
 	
-	listotrain=traindata['target'].tolist()
-	trainarray=traindata.rel_type.as_matrix()
+	listotrain = traindata['target'].tolist()
+	trainarray = traindata.rel_type.as_matrix()
 	traincounts = bigram_vectorizer.fit_transform(listotrain) #reads in test data and makes the relevant data structures
 
-	listotest=testdata['target'].tolist()
-	testarray=testdata.rel_type.as_matrix()
+	listotest = testdata['target'].tolist()
+	testarray = testdata.rel_type.as_matrix()
 	testcounts = bigram_vectorizer.transform(listotest)
 
-	clf2=MultinomialNB().fit(traincounts,trainarray) #fitting the Multinomial classifier
+	clf2 = MultinomialNB().fit(traincounts,trainarray) #fitting the Multinomial classifier
 
-	predicted= clf2.predict(testcounts)
+	predicted = clf2.predict(testcounts)
+
+# some optional print statements #
 
 	if print_testall:
 		for word, relthing in zip(listotest, predicted):
 			print ('%r => %s' % (word, relthing))
 
-	correct=np.mean(predicted == testarray)*100		
+	if print_sel:
+		print 'print the values for the first 25 instances'
+		print('GroundTruth:', testarray[0:25])
+		print('Predicted:', predicted[0:25])
 
+	if print_stats: 
+
+		print 'these are the counts in each condition:'
+		unique, counts = np.unique(y_test, return_counts=True)
+		countsdict = dict(zip(unique, counts))
+		rels = countsdict.get('rel', 'n/a').astype(float)
+		norels = countsdict.get('norel', 'n/a').astype(float)
+		tot= (rels+norels).astype(float)
+		avgrel = np.multiply(np.divide(rels, tot),100)
+		avgnorel = np.multiply(np.divide(norels, tot),100)
+		print countsdict
+		print '%f percent norel,' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count' %(rels+norels)
+
+# some print statements #
+
+	correct=np.mean(predicted == testarray)*100		
 	print '%f percent correct' %correct
+
+	nullacc = ((metrics.accuracy_score(y_test, predicted)) *100)
+	print '%f percent null accuracy; accuracy if always predicting the most frequent class' %nullacc
 	
 
 def TrainTestSplit(data, testsize, seeshape): 
 #takes data, test percentage as a decimal, and bool
-	y = data.rel_type.as_matrix()# y needs to be your dependent variable; i.e. what you want to predict
+	y = data.rel_type.as_matrix() # y needs to be your dependent variable; i.e. what you want to predict
 	trainout, testout, y_train, y_test = train_test_split(data, y, test_size=testsize)
 	# test_size gives what percent of the data you want to holdout for test
 	if seeshape:
@@ -89,9 +116,9 @@ trainout=[]
 
 testout, trainout = TrainTestSplit(maindata,0.2,True)
 
-runMultiNomClass(trainout,testout,True)
+runMultiNomClass(trainout,testout,True, True, True)
 
-runMultiNomClass(verbs,relnouns,True)
+runMultiNomClass(verbs,relnouns,True, True,True)
 
 
 ########################
@@ -103,5 +130,21 @@ runMultiNomClass(verbs,relnouns,True)
  
 # TODO for tomorrow:
 
+# get all the numbers and put them in a table
+
 # create a random test set that is just like, all rel or something, and see how it goes
+# check to make sure there are no repeat examples, words with same stem should all be in either train or test
+# try adding trigram features; should be able to memorize the data; maybe try 4-grams too; if it goes up to 98% it's broken
+# check for prefixes etc.
+# look at model parameters; all interpretable. 
+# they are the likelihood that a rel. noun will contain every bigram, convert parameter into weight feature pair tuple for rel and non; sort by weights
 # figure out how to do a confusion matrix
+
+# print out frequency of features in both sets
+
+# write a function that prints weights for features that fire for each example, by example
+# for naive bayes if we look at feature weights on their own, it's not super informative. probability of th|rel and th|nonrel
+# P(feature|rel)/P(feature|norel); will get rid of often-ness features
+
+# maybe try logistic regression too.
+# naive bayes breaks if, e.g., ther is really common, b/c whenever you see he it will be as part of th and er
