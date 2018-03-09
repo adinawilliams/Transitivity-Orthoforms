@@ -36,20 +36,23 @@ frames=[verbs_trans,verbs_ditrans]
 verbs_rel = pd.concat(frames) # makes a relational verbs dataframe
 
 verbs_intrans['rel_type']='norel'
+verbs_intrans['rel_bin']=0
 verbs_rel['rel_type']='rel'
+verbs_rel['rel_bin']=1
 
 frames2=[verbs_intrans,verbs_rel,nouns_count_only]
 stimmies=pd.concat(frames2) # created a list of a lot of words with the codings
-smallstimmies=stimmies[[u'target', u'Categories', u'Nfreq', u'Vfreq', u'freq', u'NVratio', u'Vditrans', u'Vtrans', u'Vintrans', u'Nmorph', u'MorphStatus',u'rel_type']]
+smallstimmies=stimmies[[u'target', u'Categories', u'Nfreq', u'Vfreq', u'freq', u'NVratio', u'Vditrans', u'Vtrans', u'Vintrans', u'Nmorph', u'MorphStatus',u'rel_type',u'rel_bin']]
 
 ### Get a list of relational nouns (i.e., ones from my studies)
 
 stimslist=pd.read_csv(stimlistpath)
 relstims=stimslist[stimslist.rel_type=='rel']
 relnouns=relstims[relstims.category=='n']
+relnouns['rel_bin']=1
 
 # get the relnouns into a format where they can be easily concatenated with the verbs
-relnouns=relnouns[['word','category','Nfreq','Vfreq','freq','NVratio','Vditrans','Vtrans','Vintrans','Nmorph','MorphStatus','rel_type']]
+relnouns=relnouns[['word','category','Nfreq','Vfreq','freq','NVratio','Vditrans','Vtrans','Vintrans','Nmorph','MorphStatus','rel_type', 'rel_bin']]
 relnouns.replace(to_replace='n', value="['noun']", inplace=True, limit=None, regex=False, method='pad', axis=None)
 relnouns.columns.values[1] = 'Categories'
 relnouns.columns.values[0] = 'target'
