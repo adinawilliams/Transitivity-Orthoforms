@@ -24,7 +24,7 @@ from sklearn import metrics
 #########################################
 
 
-def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_stats, print_sel): # takes a string, two pandas df, the name of a vectorizer, and 3 bools. 
+def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_stats, print_sel, sel_numb): # takes a string, two pandas df, the name of a vectorizer, and 3 bools, and a number. 
 # model can be 'MultiNomialNB' or 'Logistic'
 
 	listotrain = traindata['target'].tolist() # this will be a list of all the words you fed in
@@ -48,7 +48,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		clf2 = MultinomialNB().fit(traincounts,trainarray) #fitting the Multinomial classifier
 		score = clf2.score(traincounts, trainarray) 
 		predicted = clf2.predict(testcounts)
-
+		probs = clf2.predict_proba(testcounts)
 	# some optional print statements #
 
 		if print_testall:
@@ -57,8 +57,9 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 
 		if print_sel:
 			print 'print the values for the first 25 instances'
-			print('GroundTruth:', testarray[0:25])
-			print('Predicted:', predicted[0:25])
+			print('GroundTruth:', testarray[0:sel_numb])
+			print('Predicted:', predicted[0:sel_numb])
+			print('Probabilities, for test predictions', probs[0:sel_numb])
 		print '#########################################'
 		if print_stats: 
 
@@ -71,7 +72,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			avgrel = np.multiply(np.divide(rels, tot),100)
 			avgnorel = np.multiply(np.divide(norels, tot),100)
 			print countsdict
-			print '%f percent norel,' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count' %(rels+norels)
+			print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
 			print '#########################################'
 
 			confusion = metrics.confusion_matrix(y_test, predicted)
@@ -85,7 +86,6 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			precision = TP / float(TP + FP)
 			specificity = TN / (TN + FP)
 			print '%f false positives rate, ' %false_positive_rate + ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
-		print '#########################################'
 
 # some print statements #
 		
@@ -93,11 +93,6 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		correctOnTrain = score*100
 		print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain
 
-
-		nullacc = ((metrics.accuracy_score(y_test, predicted)) *100)
-		print '%f percent null accuracy; accuracy if always predicting the most frequent class' %nullacc	
-		print '#########################################'
-		print ''
 
 	if model == 'Logistic':	
 		print ''
@@ -117,9 +112,9 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		clf2 = LogisticRegression().fit(traincounts,replace_with_dict(trainarray, reldict)) #fitting the Logistic classifier, and recoding
 		score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
 		#clf2 = LogisticRegression().fit(traincounts,trainarray) #fitting the Logistic classifier
-		score = clf2.score(traincounts, trainarray) 
+		score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
 		predicted = clf2.predict(testcounts)
-		print len(predicted), trainarray.shape, traincounts.shape
+		probs = clf2.predict_proba(testcounts)
 
 		if print_testall:
 			for word, relthing in zip(listotest, predicted):
@@ -127,9 +122,9 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 
 		if print_sel:
 			print 'print the values for the first 25 instances'
-			print('GroundTruth:', replace_with_dict(testarray, reldict)[0:25])
-			print('Predicted:', predicted[0:25])
-			print('Probabilities, for first 25:', clf2.predict_proba(testcounts)[0:25])
+			print('GroundTruth:', replace_with_dict(testarray, reldict)[0:sel_numb])
+			print('Predicted:', predicted[0:sel_numb])
+			print('Probabilities, , for test predictions', probs[0:sel_numb])
 			print '#########################################'
 
 		if print_stats: 
@@ -143,7 +138,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			avgrel = np.multiply(np.divide(rels, tot),100)
 			avgnorel = np.multiply(np.divide(norels, tot),100)
 			print countsdict
-			print '%f percent norel,' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count' %(rels+norels)
+			print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
 			print '#########################################'
 
 			confusion = metrics.confusion_matrix(replace_with_dict(y_test, reldict), predicted)
@@ -157,14 +152,11 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			precision = TP / float(TP + FP)
 			specificity = TN / (TN + FP)
 			print '%f false positives rate, ' %false_positive_rate + ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
-			print '#########################################'
 
-		correct = np.mean(predicted == testarray)*100		
+		correct = np.mean(predicted == replace_with_dict(testarray, reldict))*100		
 		correctOnTrain = score*100
 		print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain
 
-		nullacc = ((metrics.accuracy_score(replace_with_dict(y_test, reldict), predicted)) *100)
-		print '%f percent null accuracy; accuracy if always predicting the most frequent class' %nullacc	
 		print '#########################################'
 
 
@@ -173,7 +165,7 @@ def TrainTestSplit(data, testsize, seeshape):
 #takes data, test percentage as a decimal, and bool
 	y = data.rel_type.as_matrix() # y needs to be your dependent variable; i.e. what you want to predict
 	trainout, testout, y_train, y_test = train_test_split(data, y, test_size=testsize)
-	# test_size gives what percent of the data you want to holdout for test
+	# test_size gives what percent of the data you want to holdout for test, assuming you feed it a float btw 0 and 1
 	if seeshape:
 		print trainout.shape, testout.shape
 		print y_train.shape, y_test.shape
@@ -234,9 +226,12 @@ trainout=[]
 y_test=[]
 y_train=[]
 
-testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.2,True)
 
-runClassifier('MultiNomialNB', trainout,testout,bigram_vectorizer, False, True, True)
+testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.3,True)
+
+print y_test
+
+runClassifier('MultiNomialNB', trainout,testout,bigram_vectorizer, False, True, True, 25)
 
 #runClassifier('MultiNomialNB', verbies,relnounies, bigram_vectorizer, True, True, True)
 
@@ -246,7 +241,7 @@ runClassifier('MultiNomialNB', trainout,testout,bigram_vectorizer, False, True, 
 ########################
 
 
-runClassifier('Logistic', trainout, testout, bigram_vectorizer, False, True, True)
+runClassifier('Logistic', trainout, testout, bigram_vectorizer, False, True, True, 25)
 
 
 
