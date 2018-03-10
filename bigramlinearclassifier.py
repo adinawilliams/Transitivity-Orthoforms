@@ -12,6 +12,7 @@ from sklearn import datasets, linear_model
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
+from operator import itemgetter
 
 
 #########################################
@@ -24,7 +25,15 @@ from sklearn import metrics
 #########################################
 
 
-def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_stats, print_sel, sel_numb): # takes a string, two pandas df, the name of a vectorizer, and 3 bools, and a number. 
+def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_stats, print_sel, sel_numb, print_coeffdict, coeff_numb): 
+# takes a string corresponding to model name, 
+# two pandas df
+# the name of a vectorizer, binary, trinary etc.
+# 3 bools about whether to print test stats, or selected things
+# a number for how many selected things you want to see
+# a bool correpsonding to printing the top x number of features, and a number, corresponding to how many of those you want to see. 
+
+
 # model can be 'MultiNomialNB' or 'Logistic'
 
 	listotrain = traindata['target'].tolist() # this will be a list of all the words you fed in
@@ -32,6 +41,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 	traincounts = vectorizer.fit_transform(listotrain) #reads in test data and makes the relevant data structures, i.e., all the bigrams, trigrams etc.
 	features = vectorizer.get_feature_names()
 	print(str(len(features)) + ' features created by the vectorizer')
+
 
 	listotest = testdata['target'].tolist()
 	testarray = testdata.rel_type.as_matrix()
@@ -51,7 +61,19 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		score = clf2.score(traincounts, trainarray) 
 		predicted = clf2.predict(testcounts)
 		probs = clf2.predict_proba(testcounts)
+
 		coeffs = clf2.coef_[0]
+		for coef, feat in zip(abs(clf2.coef_[0]),features):  # should give a dictionary of features and their contribution based on coeffs
+		# I also take the absolute value b/c that tells you which features contribute more; on the assumption that all features are comparable
+		# which I think is well motivated based on this dataset.
+			coef_dict[feat] = coef
+
+		newA = list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb])
+
+
+		if print_coeffdict:
+			print newA
+
 	# some optional print statements #
 
 		if print_testall:
@@ -122,7 +144,17 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		#clf2 = LogisticRegression().fit(traincounts,trainarray) #fitting the Logistic classifier
 		predicted = clf2.predict(testcounts)
 		probs = clf2.predict_proba(testcounts)
+
 		coeffs = clf2.coef_[0]
+
+		for coef, feat in zip(abs(clf2.coef_[0]),features):  # should give a dictionary of features and their contribution based on coeffs
+			coef_dict[feat] = coef
+			
+		newA = list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb])
+
+
+		if print_coeffdict:
+			print newA
 
 		if print_testall:
 			for word, relthing in zip(listotest, predicted):
@@ -237,13 +269,14 @@ testout=[]
 trainout=[]
 y_test=[]
 y_train=[]
+coef_dict = {}
 
 
-testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.3,True)
+testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.2,True)
 
 print y_test
 
-runClassifier('MultiNomialNB', trainout,testout,bigram_vectorizer, False, True, True, 25)
+runClassifier('MultiNomialNB', trainout,testout,bigram_vectorizer, False, True, True, 25, True, 100)
 
 #runClassifier('MultiNomialNB', verbies,relnounies, bigram_vectorizer, True, True, True)
 
@@ -253,7 +286,7 @@ runClassifier('MultiNomialNB', trainout,testout,bigram_vectorizer, False, True, 
 ########################
 
 
-runClassifier('Logistic', trainout, testout, bigram_vectorizer, False, True, True, 25)
+runClassifier('Logistic', trainout, testout, bigram_vectorizer, False, True, True, 25, True, 100)
 
 
 
