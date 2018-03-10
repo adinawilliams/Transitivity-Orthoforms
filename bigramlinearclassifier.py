@@ -25,13 +25,14 @@ from operator import itemgetter
 #########################################
 
 
-def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_stats, print_sel, sel_numb, print_coeffdict, coeff_numb): 
+def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testall, print_stats, print_sel, sel_numb, print_coeffdict, listofeats, coeff_numb): 
 # takes a string corresponding to model name, 
 # two pandas df
 # the name of a vectorizer, binary, trinary etc.
+# 'coef_dict' tells you where to write the dictionary that links features to their model coefficients
 # 3 bools about whether to print test stats, or selected things
 # a number for how many selected things you want to see
-# a bool correpsonding to printing the top x number of features, and a number, corresponding to how many of those you want to see. 
+# a bool corresponding to printing the top X of features ('listofeats', and a number, corresponding to items the list should contain (or the string 'all'). 
 
 
 # model can be 'MultiNomialNB' or 'Logistic'
@@ -40,7 +41,13 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 	trainarray = traindata.rel_type.as_matrix() # this will be a list of codings that correspond to the words
 	traincounts = vectorizer.fit_transform(listotrain) #reads in test data and makes the relevant data structures, i.e., all the bigrams, trigrams etc.
 	features = vectorizer.get_feature_names()
+	print ''
+	print ''
+	print ''
+	print '#########################################'
 	print(str(len(features)) + ' features created by the vectorizer')
+	print('which was designated as %s') %vectorizer
+	print '#########################################'
 
 
 	listotest = testdata['target'].tolist()
@@ -63,16 +70,21 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		probs = clf2.predict_proba(testcounts)
 
 		coeffs = clf2.coef_[0]
+
 		for coef, feat in zip(abs(clf2.coef_[0]),features):  # should give a dictionary of features and their contribution based on coeffs
 		# I also take the absolute value b/c that tells you which features contribute more; on the assumption that all features are comparable
 		# which I think is well motivated based on this dataset.
 			coef_dict[feat] = coef
 
-		newA = list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb])
+		if coeff_numb=='all':
+			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
+		else:
+			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb]))
 
 
 		if print_coeffdict:
-			print newA
+			print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
+			print listofeats
 
 	# some optional print statements #
 
@@ -86,7 +98,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			print('Predicted:', predicted[0:sel_numb])
 			print('Probabilities, for test predictions', probs[0:sel_numb])
 			print '#########################################'
-			print('Coeffs for features', coeffs)
+			#print('Coeffs for features', coef_dict)
 			print('number of coefficients found', len(coeffs)) 
 			print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
 			#sanity check, bigram vectorizer makes around 618 features, depending on the test train split
@@ -148,13 +160,19 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		coeffs = clf2.coef_[0]
 
 		for coef, feat in zip(abs(clf2.coef_[0]),features):  # should give a dictionary of features and their contribution based on coeffs
+		# I also take the absolute value b/c that tells you which features contribute more; on the assumption that all features are comparable
+		# which I think is well motivated based on this dataset.
 			coef_dict[feat] = coef
-			
-		newA = list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb])
+
+		if coeff_numb=='all':
+			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
+		else:
+			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb]))
 
 
 		if print_coeffdict:
-			print newA
+			print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
+			print listofeats
 
 		if print_testall:
 			for word, relthing in zip(listotest, predicted):
@@ -166,7 +184,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			print('Predicted:', predicted[0:sel_numb])
 			print('Probabilities, , for test predictions', probs[0:sel_numb])
 			print '#########################################'
-			print('Coeffs for features', coeffs)
+			# print('Coeffs for features', coeffs)
 			print('number of coefficients found', len(coeffs)) # e.g., sanity check, bigram vectorizer makes 618 features
 			print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
 			print '#########################################'
@@ -233,10 +251,21 @@ def replace_with_dict(ar, dic):
     # Finally index into values for desired output.
     return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
 
+def clear_datastructures():
+	testout=[]
+	trainout=[]
+	y_test=[]
+	y_train=[]
+	coef_dict_multinom = {}
+	coef_dict_logistic ={}
+	rankedfeats=[]
+	rankedlogfeats=[]
+
 
 raw_path = '/Users/Adina/Documents/Orthographic Forms/full_list.csv'
 verbs_path = '/Users/Adina/Documents/Orthographic Forms/justverbs.csv'
 relnouns_path =  '/Users/Adina/Documents/Orthographic Forms/relnouns.csv'
+
 
 
 ####################
@@ -269,16 +298,17 @@ testout=[]
 trainout=[]
 y_test=[]
 y_train=[]
-coef_dict = {}
+coef_dict_multinom = {}
+coef_dict_logistic ={}
+rankedfeats=[]
+rankedlogfeats=[]
 
-
-testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.2,True)
+testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.4,True)
 
 print y_test
 
-runClassifier('MultiNomialNB', trainout,testout,bigram_vectorizer, False, True, True, 25, True, 100)
+runClassifier('MultiNomialNB', trainout,testout, bigram_vectorizer, coef_dict_multinom,  False, True, True, 25, True, rankedfeats, 10)
 
-#runClassifier('MultiNomialNB', verbies,relnounies, bigram_vectorizer, True, True, True)
 
 
 ########################
@@ -286,35 +316,32 @@ runClassifier('MultiNomialNB', trainout,testout,bigram_vectorizer, False, True, 
 ########################
 
 
-runClassifier('Logistic', trainout, testout, bigram_vectorizer, False, True, True, 25, True, 100)
+runClassifier('Logistic', trainout, testout, trigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10)
 
 
+#runClassifier('Logistic', verbies, relnounies, bigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10). 
+# fix this
 
 
-########################
-# Testing with boring  #
-# sets.                #
-########################
-
-# N=2988
  
 # TODO for tomorrow:
 
+# write a function that prints weights for features that fire for each example, by example
+
 # get all the numbers and put them in a table
 
-# create a random test set that is just like, all rel or something, and see how it goes
+# check out the tfID thing (i.e., a way to scale for frequency)
+
 # check to make sure there are no repeat examples, words with same stem should all be in either train or test
-# try adding trigram features; should be able to memorize the data; maybe try 4-grams too; if it goes up to 98% it's broken
-# check for prefixes etc.
-# look at model parameters; all interpretable. 
+
 # they are the likelihood that a rel. noun will contain every bigram, convert parameter into weight feature pair tuple for rel and non; sort by weights
-# figure out how to do a confusion matrix
 
 # print out frequency of features in both sets
+
+# check the data for rel nouns in the no rel noun set...
 
 # write a function that prints weights for features that fire for each example, by example
 # for naive bayes if we look at feature weights on their own, it's not super informative. probability of th|rel and th|nonrel
 # P(feature|rel)/P(feature|norel); will get rid of often-ness features
 
-# maybe try logistic regression too.
 # naive bayes breaks if, e.g., ther is really common, b/c whenever you see he it will be as part of th and er
