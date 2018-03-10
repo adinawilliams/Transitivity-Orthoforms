@@ -30,6 +30,8 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 	listotrain = traindata['target'].tolist() # this will be a list of all the words you fed in
 	trainarray = traindata.rel_type.as_matrix() # this will be a list of codings that correspond to the words
 	traincounts = vectorizer.fit_transform(listotrain) #reads in test data and makes the relevant data structures, i.e., all the bigrams, trigrams etc.
+	features = vectorizer.get_feature_names()
+	print(str(len(features)) + ' features created by the vectorizer')
 
 	listotest = testdata['target'].tolist()
 	testarray = testdata.rel_type.as_matrix()
@@ -49,6 +51,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		score = clf2.score(traincounts, trainarray) 
 		predicted = clf2.predict(testcounts)
 		probs = clf2.predict_proba(testcounts)
+		coeffs = clf2.coef_[0]
 	# some optional print statements #
 
 		if print_testall:
@@ -60,6 +63,11 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			print('GroundTruth:', testarray[0:sel_numb])
 			print('Predicted:', predicted[0:sel_numb])
 			print('Probabilities, for test predictions', probs[0:sel_numb])
+			print '#########################################'
+			print('Coeffs for features', coeffs)
+			print('number of coefficients found', len(coeffs)) 
+			print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
+			#sanity check, bigram vectorizer makes around 618 features, depending on the test train split
 		print '#########################################'
 		if print_stats: 
 
@@ -112,9 +120,9 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		clf2 = LogisticRegression().fit(traincounts,replace_with_dict(trainarray, reldict)) #fitting the Logistic classifier, and recoding
 		score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
 		#clf2 = LogisticRegression().fit(traincounts,trainarray) #fitting the Logistic classifier
-		score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
 		predicted = clf2.predict(testcounts)
 		probs = clf2.predict_proba(testcounts)
+		coeffs = clf2.coef_[0]
 
 		if print_testall:
 			for word, relthing in zip(listotest, predicted):
@@ -125,6 +133,10 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			print('GroundTruth:', replace_with_dict(testarray, reldict)[0:sel_numb])
 			print('Predicted:', predicted[0:sel_numb])
 			print('Probabilities, , for test predictions', probs[0:sel_numb])
+			print '#########################################'
+			print('Coeffs for features', coeffs)
+			print('number of coefficients found', len(coeffs)) # e.g., sanity check, bigram vectorizer makes 618 features
+			print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
 			print '#########################################'
 
 		if print_stats: 

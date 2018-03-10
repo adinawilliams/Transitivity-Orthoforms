@@ -73,3 +73,5 @@ print 'csv of only relnouns is created as "relnouns_list.csv'
 
 
 
+
+
