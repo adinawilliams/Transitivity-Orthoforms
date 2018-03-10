@@ -27,9 +27,9 @@ from sklearn import metrics
 def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_stats, print_sel): # takes a string, two pandas df, the name of a vectorizer, and 3 bools. 
 # model can be 'MultiNomialNB' or 'Logistic'
 
-	listotrain = traindata['target'].tolist()
-	trainarray = traindata.rel_type.as_matrix()
-	traincounts = vectorizer.fit_transform(listotrain) #reads in test data and makes the relevant data structures
+	listotrain = traindata['target'].tolist() # this will be a list of all the words you fed in
+	trainarray = traindata.rel_type.as_matrix() # this will be a list of codings that correspond to the words
+	traincounts = vectorizer.fit_transform(listotrain) #reads in test data and makes the relevant data structures, i.e., all the bigrams, trigrams etc.
 
 	listotest = testdata['target'].tolist()
 	testarray = testdata.rel_type.as_matrix()
@@ -114,11 +114,12 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		reldict={'rel':1, 'norel':0}
 		#return len(vectorizer.fit_transform(listotrain).toarray())
 
-		# clf2 = LogisticRegression().fit(traincounts,replace_with_dict(trainarray, reldict)) #fitting the Logistic classifier, and recoding
-		#score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
-		clf2 = LogisticRegression().fit(traincounts,trainarray) #fitting the Logistic classifier
+		clf2 = LogisticRegression().fit(traincounts,replace_with_dict(trainarray, reldict)) #fitting the Logistic classifier, and recoding
+		score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
+		#clf2 = LogisticRegression().fit(traincounts,trainarray) #fitting the Logistic classifier
 		score = clf2.score(traincounts, trainarray) 
 		predicted = clf2.predict(testcounts)
+		print len(predicted), trainarray.shape, traincounts.shape
 
 		if print_testall:
 			for word, relthing in zip(listotest, predicted):
@@ -126,18 +127,18 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 
 		if print_sel:
 			print 'print the values for the first 25 instances'
-			print('GroundTruth:', testarray[0:25])
+			print('GroundTruth:', replace_with_dict(testarray, reldict)[0:25])
 			print('Predicted:', predicted[0:25])
-			#clf2.predict_proba(predicted)[0:25]
+			print('Probabilities, for first 25:', clf2.predict_proba(testcounts)[0:25])
 			print '#########################################'
 
 		if print_stats: 
 
 			print 'these are the counts in each condition:'
-			unique, counts = np.unique(y_test, return_counts=True)
+			unique, counts = np.unique(replace_with_dict(y_test, reldict), return_counts=True)
 			countsdict = dict(zip(unique, counts))
-			rels = countsdict.get('rel', 'n/a').astype(float)
-			norels = countsdict.get('norel', 'n/a').astype(float)
+			rels = countsdict.get(1, 2) # made 2 an elsewhere number here...hope that works
+			norels = countsdict.get(0, 2)
 			tot= (rels+norels).astype(float)
 			avgrel = np.multiply(np.divide(rels, tot),100)
 			avgnorel = np.multiply(np.divide(norels, tot),100)
@@ -145,7 +146,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			print '%f percent norel,' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count' %(rels+norels)
 			print '#########################################'
 
-			confusion = metrics.confusion_matrix(y_test, predicted)
+			confusion = metrics.confusion_matrix(replace_with_dict(y_test, reldict), predicted)
 			TP = confusion[1, 1]
 			TN = confusion[0, 0]
 			FP = confusion[0, 1]
@@ -162,7 +163,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		correctOnTrain = score*100
 		print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain
 
-		nullacc = ((metrics.accuracy_score(y_test, predicted)) *100)
+		nullacc = ((metrics.accuracy_score(replace_with_dict(y_test, reldict), predicted)) *100)
 		print '%f percent null accuracy; accuracy if always predicting the most frequent class' %nullacc	
 		print '#########################################'
 
@@ -175,10 +176,11 @@ def TrainTestSplit(data, testsize, seeshape):
 	# test_size gives what percent of the data you want to holdout for test
 	if seeshape:
 		print trainout.shape, testout.shape
+		print y_train.shape, y_test.shape
 
 	print 'test and train sets created, they are called "testout" and "trainout"'
 
-	return testout, trainout
+	return testout, trainout, y_train, y_test
 
 
 def replace_with_dict(ar, dic):
@@ -189,8 +191,8 @@ def replace_with_dict(ar, dic):
     # Get argsort indices
     sidx = k.argsort()
 
-    # Drop the magic bomb with searchsorted to get the corresponding
-    # places for a in keys (using sorter since a is not necessarily sorted).
+    # searchsorted to gets the corresponding indices for a 
+    # in keys (using sorter since a is not necessarily sorted).
     # Then trace it back to original order with indexing into sidx
     # Finally index into values for desired output.
     return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
@@ -229,8 +231,10 @@ reldict={'rel':1, 'norel':0}
 
 testout=[]
 trainout=[]
+y_test=[]
+y_train=[]
 
-testout, trainout = TrainTestSplit(maindata,0.2,True)
+testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.2,True)
 
 runClassifier('MultiNomialNB', trainout,testout,bigram_vectorizer, False, True, True)
 
