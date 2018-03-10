@@ -36,6 +36,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 	testcounts = vectorizer.transform(listotest)
 
 	if model == 'MultiNomialNB':	
+		print ''
 		print '#########################################'
 		print '#########################################'
 		print '#########################################'
@@ -43,6 +44,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		print '#########################################'
 		print '#########################################'
 		print '#########################################'
+		print ''
 		clf2 = MultinomialNB().fit(traincounts,trainarray) #fitting the Multinomial classifier
 		score = clf2.score(traincounts, trainarray) 
 		predicted = clf2.predict(testcounts)
@@ -57,7 +59,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			print 'print the values for the first 25 instances'
 			print('GroundTruth:', testarray[0:25])
 			print('Predicted:', predicted[0:25])
-
+		print '#########################################'
 		if print_stats: 
 
 			print 'these are the counts in each condition:'
@@ -70,7 +72,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			avgnorel = np.multiply(np.divide(norels, tot),100)
 			print countsdict
 			print '%f percent norel,' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count' %(rels+norels)
-
+			print '#########################################'
 
 			confusion = metrics.confusion_matrix(y_test, predicted)
 			TP = confusion[1, 1]
@@ -83,7 +85,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			precision = TP / float(TP + FP)
 			specificity = TN / (TN + FP)
 			print '%f false positives rate, ' %false_positive_rate + ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
-
+		print '#########################################'
 
 # some print statements #
 		
@@ -94,9 +96,11 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 
 		nullacc = ((metrics.accuracy_score(y_test, predicted)) *100)
 		print '%f percent null accuracy; accuracy if always predicting the most frequent class' %nullacc	
-
+		print '#########################################'
+		print ''
 
 	if model == 'Logistic':	
+		print ''
 		print '#########################################'
 		print '#########################################'
 		print '#########################################'
@@ -104,11 +108,17 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		print '#########################################'
 		print '#########################################'
 		print '#########################################'
+		print ''
 
+
+		reldict={'rel':1, 'norel':0}
+		#return len(vectorizer.fit_transform(listotrain).toarray())
+
+		# clf2 = LogisticRegression().fit(traincounts,replace_with_dict(trainarray, reldict)) #fitting the Logistic classifier, and recoding
+		#score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
 		clf2 = LogisticRegression().fit(traincounts,trainarray) #fitting the Logistic classifier
 		score = clf2.score(traincounts, trainarray) 
 		predicted = clf2.predict(testcounts)
-
 
 		if print_testall:
 			for word, relthing in zip(listotest, predicted):
@@ -118,7 +128,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			print 'print the values for the first 25 instances'
 			print('GroundTruth:', testarray[0:25])
 			print('Predicted:', predicted[0:25])
-			# clf2.predict_proba(testout)[0:10, 'rel']
+			#clf2.predict_proba(predicted)[0:25]
 			print '#########################################'
 
 		if print_stats: 
@@ -155,6 +165,8 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		nullacc = ((metrics.accuracy_score(y_test, predicted)) *100)
 		print '%f percent null accuracy; accuracy if always predicting the most frequent class' %nullacc	
 		print '#########################################'
+
+
 
 def TrainTestSplit(data, testsize, seeshape): 
 #takes data, test percentage as a decimal, and bool
@@ -167,6 +179,21 @@ def TrainTestSplit(data, testsize, seeshape):
 	print 'test and train sets created, they are called "testout" and "trainout"'
 
 	return testout, trainout
+
+
+def replace_with_dict(ar, dic):
+    # Extract out keys and values
+    k = np.array(list(dic.keys()))
+    v = np.array(list(dic.values()))
+
+    # Get argsort indices
+    sidx = k.argsort()
+
+    # Drop the magic bomb with searchsorted to get the corresponding
+    # places for a in keys (using sorter since a is not necessarily sorted).
+    # Then trace it back to original order with indexing into sidx
+    # Finally index into values for desired output.
+    return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
 
 
 raw_path = '/Users/Adina/Documents/Orthographic Forms/full_list.csv'
@@ -182,6 +209,7 @@ rawdata=pd.read_csv(raw_path)
 
 count_vect = CountVectorizer()
 bigram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(2, 2)) # bigram vectorizer
+# bigram_vectorizer.get_feature_names()
 trigram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(3, 3)) 
 quatgram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(4, 4)) 
 
@@ -193,6 +221,7 @@ verbies = verbs[['target','rel_type']]
 relnouns = pd.read_csv(relnouns_path)
 relnounies = relnouns[['target','rel_type']]
 
+reldict={'rel':1, 'norel':0}
 
 ########################
 # Running MultiNomial  #
