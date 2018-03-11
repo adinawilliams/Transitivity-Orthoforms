@@ -14,6 +14,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
 from operator import itemgetter
 
+#### Allows us to TFIDF #######
+
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import TfidfTransformer
+
 
 #########################################
 #  This script requires data that was   #
@@ -25,17 +30,14 @@ from operator import itemgetter
 #########################################
 
 
-def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testall, print_stats, print_sel, sel_numb, print_coeffdict, listofeats, coeff_numb): 
-# takes a string corresponding to model name, 
+def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testall, print_stats, print_sel, sel_numb, print_coeffdict, listofeats, coeff_numb, tfidf): 
+# takes a string corresponding to model name: 'MultiNomial' or 'Logistic'
 # two pandas df
 # the name of a vectorizer, binary, trinary etc.
 # 'coef_dict' tells you where to write the dictionary that links features to their model coefficients
 # 3 bools about whether to print test stats, or selected things
 # a number for how many selected things you want to see
 # a bool corresponding to printing the top X of features ('listofeats', and a number, corresponding to items the list should contain (or the string 'all'). 
-
-
-# model can be 'MultiNomialNB' or 'Logistic'
 
 	listotrain = traindata['target'].tolist() # this will be a list of all the words you fed in
 	trainarray = traindata.rel_type.as_matrix() # this will be a list of codings that correspond to the words
@@ -53,6 +55,11 @@ def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testa
 	listotest = testdata['target'].tolist()
 	testarray = testdata.rel_type.as_matrix()
 	testcounts = vectorizer.transform(listotest)
+
+	if tfidf:
+		tfidf_transformer = TfidfTransformer()
+		traincounts = tfidf_transformer.fit_transform(traincounts)
+		print "TF-IFD transform applied; traincounts overwritten"
 
 	if model == 'MultiNomialNB':	
 		print ''
@@ -93,7 +100,7 @@ def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testa
 				print ('%r => %s' % (word, relthing))
 
 		if print_sel:
-			print 'print the values for the first 25 instances'
+			print('First %s examples' %sel_numb, listotest[0:sel_numb])
 			print('GroundTruth:', testarray[0:sel_numb])
 			print('Predicted:', predicted[0:sel_numb])
 			print('Probabilities, for test predictions', probs[0:sel_numb])
@@ -127,8 +134,8 @@ def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testa
 			recall = TP / float(FN + TP)
 			precision = TP / float(TP + FP)
 			specificity = TN / (TN + FP)
-			print '%f false positives rate, ' %false_positive_rate + ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
-
+			print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
+			print metrics.classification_report(y_test, predicted)
 # some print statements #
 		
 		correct = np.mean(predicted == testarray)*100		
@@ -153,9 +160,21 @@ def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testa
 
 		clf2 = LogisticRegression().fit(traincounts,replace_with_dict(trainarray, reldict)) #fitting the Logistic classifier, and recoding
 		score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
-		#clf2 = LogisticRegression().fit(traincounts,trainarray) #fitting the Logistic classifier
 		predicted = clf2.predict(testcounts)
 		probs = clf2.predict_proba(testcounts)
+
+
+		# to plot
+		# testout['rel_type'] = testout['rel_type'].map(reldict)
+		# y_pred_prob = clf2.predict_proba(testcounts)[:, 0]
+		# plt.rcParams['font.size'] = 12
+		# plt.hist(y_pred_prob, bins=8)
+		# plt.xlim(0,1)
+		# plt.title('Histogram of predicted probabilities')
+		# plt.xlabel('Predicted probability of non-relationality')
+		# plt.ylabel('Frequency')
+		# plt.show()
+
 
 		coeffs = clf2.coef_[0]
 
@@ -179,7 +198,7 @@ def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testa
 				print ('%r => %s' % (word, relthing))
 
 		if print_sel:
-			print 'print the values for the first 25 instances'
+			print('First %s examples' %sel_numb, listotest[0:sel_numb])
 			print('GroundTruth:', replace_with_dict(testarray, reldict)[0:sel_numb])
 			print('Predicted:', predicted[0:sel_numb])
 			print('Probabilities, , for test predictions', probs[0:sel_numb])
@@ -213,7 +232,8 @@ def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testa
 			recall = TP / float(FN + TP)
 			precision = TP / float(TP + FP)
 			specificity = TN / (TN + FP)
-			print '%f false positives rate, ' %false_positive_rate + ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
+			print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
+			print metrics.classification_report(replace_with_dict(y_test, reldict), predicted)
 
 		correct = np.mean(predicted == replace_with_dict(testarray, reldict))*100		
 		correctOnTrain = score*100
@@ -300,14 +320,18 @@ y_test=[]
 y_train=[]
 coef_dict_multinom = {}
 coef_dict_logistic ={}
+
 rankedfeats=[]
 rankedlogfeats=[]
+
+coef_dict_logistic_bi ={}
+rankedlogfeats_bi=[]
 
 testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.4,True)
 
 print y_test
 
-runClassifier('MultiNomialNB', trainout,testout, bigram_vectorizer, coef_dict_multinom,  False, True, True, 25, True, rankedfeats, 10)
+runClassifier('MultiNomialNB', trainout,testout, bigram_vectorizer, coef_dict_multinom,  False, True, True, 25, True, rankedfeats, 10, False)
 
 
 
@@ -316,8 +340,8 @@ runClassifier('MultiNomialNB', trainout,testout, bigram_vectorizer, coef_dict_mu
 ########################
 
 
-runClassifier('Logistic', trainout, testout, trigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10)
-
+runClassifier('Logistic', trainout, testout, trigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10, True)
+runClassifier('Logistic', trainout, testout, bigram_vectorizer, coef_dict_logistic_bi, False, True, True, 25, True, rankedlogfeats_bi, 10, True)
 
 #runClassifier('Logistic', verbies, relnounies, bigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10). 
 # fix this
@@ -341,6 +365,10 @@ runClassifier('Logistic', trainout, testout, trigram_vectorizer, coef_dict_logis
 # check the data for rel nouns in the no rel noun set...
 
 # write a function that prints weights for features that fire for each example, by example
+# we need a dict that takes example string as key and value is a list/tuple of features and weights
+
+
+
 # for naive bayes if we look at feature weights on their own, it's not super informative. probability of th|rel and th|nonrel
 # P(feature|rel)/P(feature|norel); will get rid of often-ness features
 
