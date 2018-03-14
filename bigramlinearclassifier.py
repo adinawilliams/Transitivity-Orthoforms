@@ -30,11 +30,11 @@ from sklearn.feature_extraction.text import TfidfTransformer
 #########################################
 
 
-def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testall, print_stats, print_sel, sel_numb, print_coeffdict, listofeats, coeff_numb, tfidf): 
-# takes a string corresponding to model name: 'MultiNomial' or 'Logistic'
+def runClassifier(traindata, testdata, coef_dict, listofeats, vectorizer=bigram_vectorizer, model='Logistic', print_coeffdict=True, print_testall=False, print_stats=False, print_sel=False, sel_numb=10, coeff_numb=10, tfidf_transform=False, tf_transform=False): 
 # two pandas df
-# the name of a vectorizer, binary, trinary etc.
-# 'coef_dict' tells you where to write the dictionary that links features to their model coefficients
+# 'coef_dict' tells you where to write the dictionary that links features to their model coefficients; features get written to 'listofeats'
+# the name of a vectorizer, binary, trinary etc.; need to be externally defined
+# takes a string corresponding to model name: 'MultiNomial' or 'Logistic'
 # 3 bools about whether to print test stats, or selected things
 # a number for how many selected things you want to see
 # a bool corresponding to printing the top X of features ('listofeats', and a number, corresponding to items the list should contain (or the string 'all'). 
@@ -56,10 +56,16 @@ def runClassifier(model, traindata, testdata, vectorizer, coef_dict, print_testa
 	testarray = testdata.rel_type.as_matrix()
 	testcounts = vectorizer.transform(listotest)
 
-	if tfidf:
+	if tfidf_transform:
 		tfidf_transformer = TfidfTransformer()
 		traincounts = tfidf_transformer.fit_transform(traincounts)
 		print "TF-IFD transform applied; traincounts overwritten"
+
+	if tf_transform:
+		tf_transformer = TfidfTransformer(use_idf=False)
+		traincounts = tf_transformer.fit_transform(traincounts)
+		print "TF only transform applied; traincounts overwritten"
+
 
 	if model == 'MultiNomialNB':	
 		print ''
@@ -281,16 +287,31 @@ def clear_datastructures():
 	rankedfeats=[]
 	rankedlogfeats=[]
 
+def get_example_featweights(corpus_list, b, coef_list, vectorizer=bigram_vectorizer):
+	analyze = vectorizer.build_analyzer()
+	x={}
+	for i in corpus_list: # i is the word e.g. 'adina'
+		pair={}
+		llistt=analyze(i)
+		for it in llistt:
+			weightbyfeat=coef_list[it] # returns a single weight value for every feature (it) per word
+			pair[it]=weightbyfeat
+		x[i] = pair # write to x the key-value pair 'adina':[listofchar-ngram]
+	b.update(x)
+	print 'your dictionary of examples to features and their weights has been created'
+	print 'it is called %s' %b
+
+####################
+#  Read in Data    #
+####################
+
+
 
 raw_path = '/Users/Adina/Documents/Orthographic Forms/full_list.csv'
 verbs_path = '/Users/Adina/Documents/Orthographic Forms/justverbs.csv'
 relnouns_path =  '/Users/Adina/Documents/Orthographic Forms/relnouns.csv'
 
 
-
-####################
-#  Read in Data    #
-####################
 
 rawdata=pd.read_csv(raw_path)
 
@@ -327,21 +348,24 @@ rankedlogfeats=[]
 coef_dict_logistic_bi ={}
 rankedlogfeats_bi=[]
 
-testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.4,True)
+x={}
 
-print y_test
-
-runClassifier('MultiNomialNB', trainout,testout, bigram_vectorizer, coef_dict_multinom,  False, True, True, 25, True, rankedfeats, 10, False)
+testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.2,True)
 
 
+
+
+runClassifier(trainout, testout, coef_dict_multinom, rankedfeats, vectorizer=bigram_vectorizer, model='MultiNomialNB', print_testall=False, print_stats=True, print_sel=True, sel_numb=25, coeff_numb=25, tfidf_transform=False, tf_transform=False) 
 
 ########################
 # Running Logistic Reg #
 ########################
 
+runClassifier(trainout, testout, coef_dict_logistic, rankedlogfeats, vectorizer=trigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, sel_numb=25, coeff_numb=25, tfidf_transform=False, tf_transform=False) 
 
-runClassifier('Logistic', trainout, testout, trigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10, True)
-runClassifier('Logistic', trainout, testout, bigram_vectorizer, coef_dict_logistic_bi, False, True, True, 25, True, rankedlogfeats_bi, 10, True)
+listotest=testout['target'].tolist()
+
+get_example_featweights(listotest, x, coef_dict_logistic, vectorizer=trigram_vectorizer) #I'm running into trouble with sparseness...ugh waht
 
 #runClassifier('Logistic', verbies, relnounies, bigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10). 
 # fix this
