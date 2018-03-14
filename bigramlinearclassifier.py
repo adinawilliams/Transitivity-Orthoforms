@@ -287,7 +287,7 @@ def clear_datastructures():
 	rankedfeats=[]
 	rankedlogfeats=[]
 
-def get_example_featweights(corpus_list, b, coef_list, vectorizer=bigram_vectorizer):
+def get_example_featweights_dict(corpus_list, b, coef_list, vectorizer=bigram_vectorizer):
 	analyze = vectorizer.build_analyzer()
 	x={}
 	for i in corpus_list: # i is the word e.g. 'adina'
@@ -299,7 +299,7 @@ def get_example_featweights(corpus_list, b, coef_list, vectorizer=bigram_vectori
 		x[i] = pair # write to x the key-value pair 'adina':[listofchar-ngram]
 	b.update(x)
 	print 'your dictionary of examples to features and their weights has been created'
-	print 'it is called %s' %b
+	#print 'it is called %s' %b this prints your list
 
 ####################
 #  Read in Data    #
@@ -307,7 +307,7 @@ def get_example_featweights(corpus_list, b, coef_list, vectorizer=bigram_vectori
 
 
 
-raw_path = '/Users/Adina/Documents/Orthographic Forms/full_list.csv'
+raw_path = '/Users/Adina/git/Transitivity-Orthoforms/full_list_no_dash.csv'
 verbs_path = '/Users/Adina/Documents/Orthographic Forms/justverbs.csv'
 relnouns_path =  '/Users/Adina/Documents/Orthographic Forms/relnouns.csv'
 
@@ -363,9 +363,11 @@ runClassifier(trainout, testout, coef_dict_multinom, rankedfeats, vectorizer=big
 
 runClassifier(trainout, testout, coef_dict_logistic, rankedlogfeats, vectorizer=trigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, sel_numb=25, coeff_numb=25, tfidf_transform=False, tf_transform=False) 
 
-listotest=testout['target'].tolist()
+listotrain=trainout['target'].tolist()
 
-get_example_featweights(listotest, x, coef_dict_logistic, vectorizer=trigram_vectorizer) #I'm running into trouble with sparseness...ugh waht
+get_example_featweights_dict(listotrain, x, coef_dict_logistic, vectorizer=trigram_vectorizer) #I'm running into trouble with sparseness...ugh waht
+
+
 
 #runClassifier('Logistic', verbies, relnounies, bigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10). 
 # fix this
@@ -374,7 +376,7 @@ get_example_featweights(listotest, x, coef_dict_logistic, vectorizer=trigram_vec
  
 # TODO for tomorrow:
 
-# write a function that prints weights for features that fire for each example, by example
+
 
 # get all the numbers and put them in a table
 
