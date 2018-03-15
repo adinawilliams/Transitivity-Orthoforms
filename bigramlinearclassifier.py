@@ -16,7 +16,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
 from operator import itemgetter
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
 #### Allows us to TFIDF #######
 
 from sklearn.pipeline import Pipeline
@@ -33,7 +36,11 @@ from sklearn.feature_extraction.text import TfidfTransformer
 #########################################
 
 
+<<<<<<< HEAD
 def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectorizer=bigram_vectorizer, model='Logistic', print_coeffdict=True, print_probs=True, print_testall=False, print_stats=False, print_sel=False, sel_numb=10, coeff_numb=10, tfidf_transform=False, tf_transform=False): 
+=======
+def runClassifier(traindata, testdata, coef_dict, listofeats, vectorizer=bigram_vectorizer, model='Logistic', print_coeffdict=True, print_testall=False, print_stats=False, print_sel=False, sel_numb=10, coeff_numb=10, tfidf_transform=False, tf_transform=False): 
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
 # two pandas df
 # 'coef_dict' tells you where to write the dictionary that links features to their model coefficients; features get written to 'listofeats'
 # the name of a vectorizer, binary, trinary etc.; need to be externally defined
@@ -85,6 +92,7 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 		predicted = clf2.predict(testcounts)
 		probs = clf2.predict_proba(testcounts)
 
+<<<<<<< HEAD
 		if print_probs:
 			prlist = list(map(tuple, probs))
 			for i in listotest:
@@ -95,6 +103,13 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 		for coef, feat in zip(abs(clf2.coef_[0]),features):  # should give a dictionary of features and their contribution based on coeffs
 		# I also take the absolute value b/c that tells you which features contribute more, but not whether it's to rel or norel; 
 		# on the assumption that all features are comparable which I think is well motivated based on this dataset.
+=======
+		coeffs = clf2.coef_[0]
+
+		for coef, feat in zip(abs(clf2.coef_[0]),features):  # should give a dictionary of features and their contribution based on coeffs
+		# I also take the absolute value b/c that tells you which features contribute more; on the assumption that all features are comparable
+		# which I think is well motivated based on this dataset.
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
 			coef_dict[feat] = coef
 
 		if coeff_numb=='all':
@@ -105,9 +120,13 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 
 		if print_coeffdict:
 			print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
+<<<<<<< HEAD
 			print len(listofeats)
 			print listofeats
 
+=======
+			print listofeats
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
 
 	# some optional print statements #
 
@@ -178,7 +197,11 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 		score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
 		predicted = clf2.predict(testcounts)
 		probs = clf2.predict_proba(testcounts)
+<<<<<<< HEAD
 		
+=======
+
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
 
 		# to plot
 		# testout['rel_type'] = testout['rel_type'].map(reldict)
@@ -199,7 +222,10 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 		# which I think is well motivated based on this dataset.
 			coef_dict[feat] = coef
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
 		if coeff_numb=='all':
 			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
 		else:
@@ -303,9 +329,12 @@ def clear_datastructures():
 	coef_dict_logistic ={}
 	rankedfeats=[]
 	rankedlogfeats=[]
+<<<<<<< HEAD
 	x={}
 	probsdict={}
 	print 'all datastructures have been cleared'
+=======
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
 
 def get_example_featweights_dict(corpus_list, b, coef_list, vectorizer=bigram_vectorizer):
 	analyze = vectorizer.build_analyzer()
@@ -321,6 +350,7 @@ def get_example_featweights_dict(corpus_list, b, coef_list, vectorizer=bigram_ve
 	print 'your dictionary of examples to features and their weights has been created'
 	#print 'it is called %s' %b this prints your list
 
+<<<<<<< HEAD
 def save_all(b, coeflist, probsdict, name, run_numb, save_loc, make_featweights=False):  #name should be the run you are using e.g., logistic no TF
 	namestr = save_loc + name + 'Run' + str(run_numb) + 'featweights'
 	coefnamestr = save_loc + name + 'Run' + str(run_numb) + 'coefs'
@@ -342,11 +372,19 @@ def save_all(b, coeflist, probsdict, name, run_numb, save_loc, make_featweights=
 	print 'your coeff_list and feature weights for examples have been created for model %s '%name + ' run %d' %run_numb
 	print 'your files are saved as %s' %namestr + ' and %s' %coefnamestr + ' and %s' %probsnamestr
 
-
-
+=======
 ####################
 #  Read in Data    #
 ####################
+
+
+
+raw_path = '/Users/Adina/git/Transitivity-Orthoforms/full_list_no_dash.csv'
+verbs_path = '/Users/Adina/Documents/Orthographic Forms/justverbs.csv'
+relnouns_path =  '/Users/Adina/Documents/Orthographic Forms/relnouns.csv'
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
+
+
 
 
 
@@ -382,6 +420,7 @@ testout=[]
 trainout=[]
 y_test=[]
 y_train=[]
+<<<<<<< HEAD
 #coef_dict_multinom = {}
 coef_dict_logistic ={}
 probsdict={}
@@ -395,6 +434,18 @@ coef_dict_logistic_bi ={}
 x={}
 
 clear_datastructures()
+=======
+coef_dict_multinom = {}
+coef_dict_logistic ={}
+
+rankedfeats=[]
+rankedlogfeats=[]
+
+coef_dict_logistic_bi ={}
+rankedlogfeats_bi=[]
+
+x={}
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
 
 testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.2,True)
 
@@ -402,13 +453,22 @@ testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.2,True)
 
 #runClassifier(trainout, testout, coef_dict_multinom, rankedfeats, vectorizer=bigram_vectorizer, model='MultiNomialNB', print_testall=False, print_stats=True, print_sel=True, sel_numb=25, coeff_numb=25, tfidf_transform=False, tf_transform=False) 
 
+runClassifier(trainout, testout, coef_dict_multinom, rankedfeats, vectorizer=bigram_vectorizer, model='MultiNomialNB', print_testall=False, print_stats=True, print_sel=True, sel_numb=25, coeff_numb=25, tfidf_transform=False, tf_transform=False) 
+
 ########################
 # Running Logistic Reg #
 ########################
 
+runClassifier(trainout, testout, coef_dict_logistic, rankedlogfeats, vectorizer=trigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, sel_numb=25, coeff_numb=25, tfidf_transform=False, tf_transform=False) 
 
+<<<<<<< HEAD
 
 runClassifier(trainout, testout, coef_dict_logistic, probsdict, rankedlogfeats, vectorizer=bigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, sel_numb=25, coeff_numb=25, tfidf_transform=False, tf_transform=True) 
+=======
+listotrain=trainout['target'].tolist()
+
+get_example_featweights_dict(listotrain, x, coef_dict_logistic, vectorizer=trigram_vectorizer) #I'm running into trouble with sparseness...ugh waht
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
 
 listotrain=trainout['target'].tolist()
 
@@ -419,6 +479,12 @@ save_all(x, coef_dict_logistic, probsdict, 'logistic2GramTF', 5, results_path)
 #runClassifier('Logistic', verbies, relnounies, bigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10). 
 # fix this
 
+<<<<<<< HEAD
+=======
+#runClassifier('Logistic', verbies, relnounies, bigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10). 
+# fix this
+
+>>>>>>> eeae3594309e800e1bbd314278af6ebc24bcd13f
 
  
 # TODO for tomorrow:
