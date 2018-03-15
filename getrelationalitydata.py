@@ -16,6 +16,11 @@ rawdata=pd.read_csv(raw_path)
 df=rawdata[['target','Categories','Nfreq','Vfreq','freq','NVratio','Ncount','Nmass',
 'Vditrans','Vtrans','Vintrans','Nmorph','MorphStatus']] # gives the relevant subset of the data that I need for this task
 
+# to filter out examples with - in them, because that's multimorphemic.
+
+# df[df.target.str.contains("-")==False]
+df.drop_duplicates(subset='target', keep='first', inplace=True) # this removes all duplicate targets
+
 ## NOUNS ##
 nouns=df[df.Nfreq!=0]
 nounsonly=nouns[nouns.Categories=="['noun']"] # this allows us to pull out words that are unambiguously nouns
@@ -60,16 +65,18 @@ relnouns.columns.values[0] = 'target'
 
 framesagain=[relnouns,smallstimmies]
 fulllist=pd.concat(framesagain)
-fulllist.to_csv('/Users/Adina/Documents/Orthographic Forms/full_list.csv')
+fulllist.to_csv('/Users/Adina/Documents/Orthographic Forms/full_list.csv', index=False)
 print 'csv of all stims is created as "full_list.csv'
 
 frames3=[verbs_intrans,verbs_rel]
 justverbs=pd.concat(frames3)
-justverbs.to_csv('/Users/Adina/Documents/Orthographic Forms/justverbs.csv')
+justverbs.to_csv('/Users/Adina/Documents/Orthographic Forms/justverbs.csv', index=False)
 print 'csv of only verbs is created as "verbs_list.csv'
 
-relnouns.to_csv('/Users/Adina/Documents/Orthographic Forms/relnouns.csv')
+relnouns.to_csv('/Users/Adina/Documents/Orthographic Forms/relnouns.csv', index=False)
 print 'csv of only relnouns is created as "relnouns_list.csv'
+
+
 
 
 

@@ -5,6 +5,8 @@ import random
 import re
 import pandas as pd
 import matplotlib.pyplot as plt
+import csv
+
 from sklearn import *
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
@@ -12,6 +14,13 @@ from sklearn import datasets, linear_model
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
+from operator import itemgetter
+
+
+#### Allows us to TFIDF #######
+
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import TfidfTransformer
 
 
 #########################################
@@ -24,16 +33,42 @@ from sklearn import metrics
 #########################################
 
 
-def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_stats, print_sel): # takes a string, two pandas df, the name of a vectorizer, and 3 bools. 
-# model can be 'MultiNomialNB' or 'Logistic'
+def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectorizer=bigram_vectorizer, model='Logistic', print_coeffdict=True, print_probs=True, print_testall=False, print_stats=False, print_sel=False, sel_numb=10, coeff_numb=10, tfidf_transform=False, tf_transform=False): 
+# two pandas df
+# 'coef_dict' tells you where to write the dictionary that links features to their model coefficients; features get written to 'listofeats'
+# the name of a vectorizer, binary, trinary etc.; need to be externally defined
+# takes a string corresponding to model name: 'MultiNomial' or 'Logistic'
+# 3 bools about whether to print test stats, or selected things
+# a number for how many selected things you want to see
+# a bool corresponding to printing the top X of features ('listofeats', and a number, corresponding to items the list should contain (or the string 'all'). 
 
 	listotrain = traindata['target'].tolist() # this will be a list of all the words you fed in
 	trainarray = traindata.rel_type.as_matrix() # this will be a list of codings that correspond to the words
 	traincounts = vectorizer.fit_transform(listotrain) #reads in test data and makes the relevant data structures, i.e., all the bigrams, trigrams etc.
+	features = vectorizer.get_feature_names()
+	print ''
+	print ''
+	print ''
+	print '#########################################'
+	print(str(len(features)) + ' features created by the vectorizer')
+	print('which was designated as %s') %vectorizer
+	print '#########################################'
+
 
 	listotest = testdata['target'].tolist()
 	testarray = testdata.rel_type.as_matrix()
 	testcounts = vectorizer.transform(listotest)
+
+	if tfidf_transform:
+		tfidf_transformer = TfidfTransformer()
+		traincounts = tfidf_transformer.fit_transform(traincounts)
+		print "TF-IFD transform applied; traincounts overwritten"
+
+	if tf_transform:
+		tf_transformer = TfidfTransformer(use_idf=False)
+		traincounts = tf_transformer.fit_transform(traincounts)
+		print "TF only transform applied; traincounts overwritten"
+
 
 	if model == 'MultiNomialNB':	
 		print ''
@@ -48,6 +83,31 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 		clf2 = MultinomialNB().fit(traincounts,trainarray) #fitting the Multinomial classifier
 		score = clf2.score(traincounts, trainarray) 
 		predicted = clf2.predict(testcounts)
+		probs = clf2.predict_proba(testcounts)
+
+		if print_probs:
+			prlist = list(map(tuple, probs))
+			for i in listotest:
+				probsdict[i]=prlist[i]
+
+		coeffs = clf2.coef_[0]
+
+		for coef, feat in zip(abs(clf2.coef_[0]),features):  # should give a dictionary of features and their contribution based on coeffs
+		# I also take the absolute value b/c that tells you which features contribute more, but not whether it's to rel or norel; 
+		# on the assumption that all features are comparable which I think is well motivated based on this dataset.
+			coef_dict[feat] = coef
+
+		if coeff_numb=='all':
+			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
+		else:
+			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb]))
+
+
+		if print_coeffdict:
+			print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
+			print len(listofeats)
+			print listofeats
+
 
 	# some optional print statements #
 
@@ -56,9 +116,15 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 				print ('%r => %s' % (word, relthing))
 
 		if print_sel:
-			print 'print the values for the first 25 instances'
-			print('GroundTruth:', testarray[0:25])
-			print('Predicted:', predicted[0:25])
+			print('First %s examples' %sel_numb, listotest[0:sel_numb])
+			print('GroundTruth:', testarray[0:sel_numb])
+			print('Predicted:', predicted[0:sel_numb])
+			print('Probabilities, for test predictions', probs[0:sel_numb])
+			print '#########################################'
+			#print('Coeffs for features', coef_dict)
+			print('number of coefficients found', len(coeffs)) 
+			print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
+			#sanity check, bigram vectorizer makes around 618 features, depending on the test train split
 		print '#########################################'
 		if print_stats: 
 
@@ -71,7 +137,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			avgrel = np.multiply(np.divide(rels, tot),100)
 			avgnorel = np.multiply(np.divide(norels, tot),100)
 			print countsdict
-			print '%f percent norel,' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count' %(rels+norels)
+			print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
 			print '#########################################'
 
 			confusion = metrics.confusion_matrix(y_test, predicted)
@@ -84,20 +150,14 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			recall = TP / float(FN + TP)
 			precision = TP / float(TP + FP)
 			specificity = TN / (TN + FP)
-			print '%f false positives rate, ' %false_positive_rate + ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
-		print '#########################################'
-
+			print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
+			print metrics.classification_report(y_test, predicted)
 # some print statements #
 		
 		correct = np.mean(predicted == testarray)*100		
 		correctOnTrain = score*100
 		print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain
 
-
-		nullacc = ((metrics.accuracy_score(y_test, predicted)) *100)
-		print '%f percent null accuracy; accuracy if always predicting the most frequent class' %nullacc	
-		print '#########################################'
-		print ''
 
 	if model == 'Logistic':	
 		print ''
@@ -116,20 +176,59 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 
 		clf2 = LogisticRegression().fit(traincounts,replace_with_dict(trainarray, reldict)) #fitting the Logistic classifier, and recoding
 		score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
-		#clf2 = LogisticRegression().fit(traincounts,trainarray) #fitting the Logistic classifier
-		score = clf2.score(traincounts, trainarray) 
 		predicted = clf2.predict(testcounts)
-		print len(predicted), trainarray.shape, traincounts.shape
+		probs = clf2.predict_proba(testcounts)
+		
+
+		# to plot
+		# testout['rel_type'] = testout['rel_type'].map(reldict)
+		# y_pred_prob = clf2.predict_proba(testcounts)[:, 0]
+		# plt.rcParams['font.size'] = 12
+		# plt.hist(y_pred_prob, bins=8)
+		# plt.xlim(0,1)
+		# plt.title('Histogram of predicted probabilities')
+		# plt.xlabel('Predicted probability of non-relationality')
+		# plt.ylabel('Frequency')
+		# plt.show()
+
+
+		coeffs = clf2.coef_[0]
+
+		for coef, feat in zip(abs(clf2.coef_[0]),features):  # should give a dictionary of features and their contribution based on coeffs
+		# I also take the absolute value b/c that tells you which features contribute more; on the assumption that all features are comparable
+		# which I think is well motivated based on this dataset.
+			coef_dict[feat] = coef
+
+
+		if coeff_numb=='all':
+			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
+		else:
+			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb]))
+
+
+		if print_coeffdict:
+			print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
+			print listofeats
 
 		if print_testall:
 			for word, relthing in zip(listotest, predicted):
 				print ('%r => %s' % (word, relthing))
 
+		if print_probs:
+			prlist = list(map(tuple, probs))
+			for i in xrange(len(listotest)):
+				probsdict[listotest[i]]=prlist[i]
+
+
 		if print_sel:
-			print 'print the values for the first 25 instances'
-			print('GroundTruth:', replace_with_dict(testarray, reldict)[0:25])
-			print('Predicted:', predicted[0:25])
-			print('Probabilities, for first 25:', clf2.predict_proba(testcounts)[0:25])
+			print('First %s examples' %sel_numb, listotest[0:sel_numb])
+			print('GroundTruth:', replace_with_dict(testarray, reldict)[0:sel_numb])
+			print('Predicted:', predicted[0:sel_numb])
+			print('Probabilities, , for test predictions', probs[0:sel_numb])
+			print '#########################################'
+			# print('Coeffs for features', coeffs)
+			print('number of coefficients found', len(coeffs)) # e.g., sanity check, bigram vectorizer makes 618 features
+			print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
 			print '#########################################'
 
 		if print_stats: 
@@ -143,7 +242,7 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			avgrel = np.multiply(np.divide(rels, tot),100)
 			avgnorel = np.multiply(np.divide(norels, tot),100)
 			print countsdict
-			print '%f percent norel,' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count' %(rels+norels)
+			print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
 			print '#########################################'
 
 			confusion = metrics.confusion_matrix(replace_with_dict(y_test, reldict), predicted)
@@ -156,15 +255,13 @@ def runClassifier(model, traindata, testdata, vectorizer, print_testall, print_s
 			recall = TP / float(FN + TP)
 			precision = TP / float(TP + FP)
 			specificity = TN / (TN + FP)
-			print '%f false positives rate, ' %false_positive_rate + ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
-			print '#########################################'
+			print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
+			print metrics.classification_report(replace_with_dict(y_test, reldict), predicted)
 
-		correct = np.mean(predicted == testarray)*100		
+		correct = np.mean(predicted == replace_with_dict(testarray, reldict))*100		
 		correctOnTrain = score*100
 		print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain
 
-		nullacc = ((metrics.accuracy_score(replace_with_dict(y_test, reldict), predicted)) *100)
-		print '%f percent null accuracy; accuracy if always predicting the most frequent class' %nullacc	
 		print '#########################################'
 
 
@@ -173,7 +270,7 @@ def TrainTestSplit(data, testsize, seeshape):
 #takes data, test percentage as a decimal, and bool
 	y = data.rel_type.as_matrix() # y needs to be your dependent variable; i.e. what you want to predict
 	trainout, testout, y_train, y_test = train_test_split(data, y, test_size=testsize)
-	# test_size gives what percent of the data you want to holdout for test
+	# test_size gives what percent of the data you want to holdout for test, assuming you feed it a float btw 0 and 1
 	if seeshape:
 		print trainout.shape, testout.shape
 		print y_train.shape, y_test.shape
@@ -197,15 +294,67 @@ def replace_with_dict(ar, dic):
     # Finally index into values for desired output.
     return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
 
+def clear_datastructures():
+	testout=[]
+	trainout=[]
+	y_test=[]
+	y_train=[]
+	coef_dict_multinom = {}
+	coef_dict_logistic ={}
+	rankedfeats=[]
+	rankedlogfeats=[]
+	x={}
+	probsdict={}
+	print 'all datastructures have been cleared'
 
-raw_path = '/Users/Adina/Documents/Orthographic Forms/full_list.csv'
-verbs_path = '/Users/Adina/Documents/Orthographic Forms/justverbs.csv'
-relnouns_path =  '/Users/Adina/Documents/Orthographic Forms/relnouns.csv'
+def get_example_featweights_dict(corpus_list, b, coef_list, vectorizer=bigram_vectorizer):
+	analyze = vectorizer.build_analyzer()
+	x={}
+	for i in corpus_list: # i is the word e.g. 'adina'
+		pair={}
+		llistt=analyze(i)
+		for it in llistt:
+			weightbyfeat=coef_list[it] # returns a single weight value for every feature (it) per word
+			pair[it]=weightbyfeat
+		x[i] = pair # write to x the key-value pair 'adina':[listofchar-ngram]
+	b.update(x)
+	print 'your dictionary of examples to features and their weights has been created'
+	#print 'it is called %s' %b this prints your list
+
+def save_all(b, coeflist, probsdict, name, run_numb, save_loc, make_featweights=False):  #name should be the run you are using e.g., logistic no TF
+	namestr = save_loc + name + 'Run' + str(run_numb) + 'featweights'
+	coefnamestr = save_loc + name + 'Run' + str(run_numb) + 'coefs'
+	probsnamestr= save_loc + name + 'TestRun' + str(run_numb) + 'Probs'
+
+	print "please be patient, I am creating your output result files"
+
+	if make_featweights:
+		print "you ordered a feature weights file, this might take a moment"
+		dff = pd.DataFrame.from_dict(b, orient='index').fillna(0)
+		dff.to_csv(namestr)
+
+	with open(probsnamestr, "wb") as f:
+		csv.writer(f).writerows((k,) + v for k, v in probsdict.iteritems())
+
+	coefpddf=pd.DataFrame.from_dict(coef_dict_logistic, orient='index')
+	coefpddf.to_csv(coefnamestr)
+
+	print 'your coeff_list and feature weights for examples have been created for model %s '%name + ' run %d' %run_numb
+	print 'your files are saved as %s' %namestr + ' and %s' %coefnamestr + ' and %s' %probsnamestr
+
 
 
 ####################
 #  Read in Data    #
 ####################
+
+
+
+raw_path = '/Users/Adina/git/Transitivity-Orthoforms/full_list_no_dash.csv'
+verbs_path = '/Users/Adina/Documents/Orthographic Forms/justverbs.csv'
+relnouns_path =  '/Users/Adina/Documents/Orthographic Forms/relnouns.csv'
+results_path = '/Users/Adina/git/Transitivity-Orthoforms/Results/'
+
 
 rawdata=pd.read_csv(raw_path)
 
@@ -233,48 +382,67 @@ testout=[]
 trainout=[]
 y_test=[]
 y_train=[]
+#coef_dict_multinom = {}
+coef_dict_logistic ={}
+probsdict={}
+
+#rankedfeats=[]
+rankedlogfeats=[]
+
+coef_dict_logistic_bi ={}
+#rankedlogfeats_bi=[]
+
+x={}
+
+clear_datastructures()
 
 testout, trainout, y_train, y_test = TrainTestSplit(maindata,0.2,True)
 
-runClassifier('MultiNomialNB', trainout,testout,bigram_vectorizer, False, True, True)
 
-#runClassifier('MultiNomialNB', verbies,relnounies, bigram_vectorizer, True, True, True)
 
+#runClassifier(trainout, testout, coef_dict_multinom, rankedfeats, vectorizer=bigram_vectorizer, model='MultiNomialNB', print_testall=False, print_stats=True, print_sel=True, sel_numb=25, coeff_numb=25, tfidf_transform=False, tf_transform=False) 
 
 ########################
 # Running Logistic Reg #
 ########################
 
 
-runClassifier('Logistic', trainout, testout, bigram_vectorizer, False, True, True)
+
+runClassifier(trainout, testout, coef_dict_logistic, probsdict, rankedlogfeats, vectorizer=bigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, sel_numb=25, coeff_numb=25, tfidf_transform=False, tf_transform=True) 
+
+listotrain=trainout['target'].tolist()
+
+get_example_featweights_dict(listotrain, x, coef_dict_logistic, vectorizer=bigram_vectorizer) 
+
+save_all(x, coef_dict_logistic, probsdict, 'logistic2GramTF', 5, results_path) 
+
+#runClassifier('Logistic', verbies, relnounies, bigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10). 
+# fix this
 
 
-
-
-########################
-# Testing with boring  #
-# sets.                #
-########################
-
-# N=2988
  
 # TODO for tomorrow:
 
+
+
 # get all the numbers and put them in a table
 
-# create a random test set that is just like, all rel or something, and see how it goes
+# check out the tfID thing (i.e., a way to scale for frequency)
+
 # check to make sure there are no repeat examples, words with same stem should all be in either train or test
-# try adding trigram features; should be able to memorize the data; maybe try 4-grams too; if it goes up to 98% it's broken
-# check for prefixes etc.
-# look at model parameters; all interpretable. 
+
 # they are the likelihood that a rel. noun will contain every bigram, convert parameter into weight feature pair tuple for rel and non; sort by weights
-# figure out how to do a confusion matrix
 
 # print out frequency of features in both sets
 
+# check the data for rel nouns in the no rel noun set...
+
 # write a function that prints weights for features that fire for each example, by example
+# we need a dict that takes example string as key and value is a list/tuple of features and weights
+
+
+
 # for naive bayes if we look at feature weights on their own, it's not super informative. probability of th|rel and th|nonrel
 # P(feature|rel)/P(feature|norel); will get rid of often-ness features
 
-# maybe try logistic regression too.
 # naive bayes breaks if, e.g., ther is really common, b/c whenever you see he it will be as part of th and er
