@@ -11,7 +11,7 @@ from sklearn import *
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import datasets, linear_model
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, KFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.utils import shuffle
 from sklearn import metrics
@@ -35,7 +35,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 #########################################
 
 
-def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path, vectorizer=bigram_vectorizer, model='Logistic', print_coeffdict=True, print_probs=True, print_testall=False, print_stats=False, print_sel=False, save_all_of_it=True, sel_numb=10, k_num=5, coeff_numb=10, tfidf_transform=False, tf_transform=False): 
+def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, model='Logistic', print_coeffdict=True, print_probs=True, print_testall=False, print_stats=False, print_sel=False, save_all_of_it=True, sel_numb=10, k_num=5, coeff_numb=10, tfidf_transform=False, tf_transform=False): 
 # two pandas df
 # 'coef_dict' tells you where to write the dictionary that links features to their model coefficients; features get written to 'listofeats'
 # the name of a vectorizer, binary, trinary etc.; need to be externally defined
@@ -55,6 +55,7 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path,
 
 	forsavies=countsALL.toarray()
 	features = vectorizer.get_feature_names()
+	print features
 	dff=pd.DataFrame(data=forsavies, index=listALL, columns=features)
 	cc=dff.sum(axis=0)
 	nameywamey=re.findall(r'range=\(\d',str(vectorizer))[0][-1]
@@ -97,6 +98,10 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path,
 		X_train, X_test = X[train_idx], X[test_idx]
 		y_train, y_test = y[train_idx], y[test_idx]
 		ll=test_idx.tolist()
+		# feats=[]
+		# 	for i in ll:
+		# 		feats.append(listALL[i])
+		# 		testfeatures.append(feats)
 		start=ll[0]
 		stop=start+len(ll)
 		listostuffs = listALL[start:stop]
@@ -414,7 +419,7 @@ def clear_datastructures():
 	probsdict={}
 	print 'all datastructures have been cleared'
 
-def get_example_featweights_dict(corpus_list, b, coef_list, vectorizer=bigram_vectorizer):
+def get_example_featweights_dict(corpus_list, b, coef_list, vectorizer):
 	analyze = vectorizer.build_analyzer()
 	x={}
 	for i in corpus_list: # i is the word e.g. 'adina'
@@ -493,7 +498,6 @@ probsdict={}
 #rankedfeats=[]
 rankedlogfeats=[]
 
-coef_dict_logistic_bi ={}
 #rankedlogfeats_bi=[]
 
 x={}

@@ -21,17 +21,20 @@ def get_topn(path, gramsize, n_int):  #n-int is the top and bottom n, gramsize-g
 		name= 'logistic'+ str(gramsize) + 'gramRun' + str(num) + 'coefs'
 		df=pd.read_csv(path+name)
 		df.columns=['n-gram','weight']
+		print df
 		if num==1:
 			res=df
 			print res
 		else:	
 			res=pd.merge(res, df, on='n-gram')
-	res['mean']=result.mean(axis=1)
+	res['mean']=res.mean(axis=1)
+	print res
 	res.sort_values(['mean'], ascending=False, inplace=True)
 	res=res[['n-gram', 'mean']]
 
 	commonsfile=pd.read_csv(path + str(gramsize)+'gramALLfeatureCountsCommons.csv')
 	commons=pd.merge(res, commonsfile, on='n-gram') #gets you the common n-grams
+	commons.dropna(inplace=True)
 	heads=commons.head(n_int)
 	tails=commons.tail(n_int)
 	tails.sort_values(['mean'], ascending=True, inplace=True)
@@ -53,7 +56,7 @@ path='/Users/Adina/git/Transitivity-Orthoforms/Results/'
 
 
 for i in xrange(1,7):
-	make_commons(path, i, 20)
+	make_commons(path, i, 15)
 	get topn(path, i, 15)
 
 
