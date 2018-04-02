@@ -16,6 +16,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.utils import shuffle
 from sklearn import metrics
 from operator import itemgetter
+from collections import defaultdict
 
 
 #### Allows us to TFIDF #######
@@ -55,6 +56,12 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path,
 	forsavies=countsALL.toarray()
 	features = vectorizer.get_feature_names()
 	dff=pd.DataFrame(data=forsavies, index=listALL, columns=features)
+	cc=dff.sum(axis=0)
+	nameywamey=re.findall(r'range=\(\d',str(vectorizer))[0][-1]
+	print 'I am printing the counts for all your n-grams, be patient; this might take a hot min.'
+	cc.to_csv(save_loc + nameywamey + 'gramALLfeatureCounts')
+	print "your csv with counts for features has been created"
+	print 'it is saved here %s' %(save_loc + nameywamey + 'gramALLfeatureCounts')
 
 	print ''
 	print ''
@@ -79,9 +86,12 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path,
 		traincounts = tf_transformer.fit_transform(countsALL)
 		print "TF only transform applied; traincounts overwritten"
 
+	fulldictOfResults={}
+
 	kf = KFold(n_splits=k_num)
 	fold = 0
 	for train_idx, test_idx in kf.split(X):
+		dictoResults={}
 		fold += 1
 		X_train, X_test = X[train_idx], X[test_idx]
 		y_train, y_test = y[train_idx], y[test_idx]
@@ -173,7 +183,8 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path,
 				false_positive_rate = FP / float(TN + FP)
 				recall = TP / float(FN + TP)
 				precision = TP / float(TP + FP)
-				specificity = TN / (TN + FP)
+				specificity = TN / float(TN + FP)
+				F1 = float(2 * float(precision * recall) / float(precision + recall))
 				print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
 				print metrics.classification_report(y_test, predicted)
 	# some print statements #
@@ -182,6 +193,35 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path,
 			correctOnTrain = score*100
 			print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain
 
+			dictoResults['numbCoeff'] = len(coeffs)
+			dictoResults['numbRel'] = countsdict[1]
+			dictoResults['MostFreqClassAccNoRel'] = avgnorel
+			dictoResults['TestSetAcc'] = correct
+			dictoResults['TrainingSetAcc'] = correctOnTrain
+			dictoResults['FalsePositives'] = false_positive_rate
+			dictoResults['precisionRel'] = precision
+			dictoResults['recallRel'] = recall
+			dictoResults['DiffAcc'] = float(correct-avgnorel)
+			dictoResults['F1'] = F1
+			fulldictOfResults[str(fold)]=dictoResults
+			with open(save_loc + nameywamey + 'gramResultsDict'+'.csv', 'wb') as csv_file:
+				writer = csv.writer(csv_file)
+				for key, value in fulldictOfResults.items():
+					writer.writerow([key, value])
+
+		by_fold = defaultdict(list)
+			# aggregate to the default dict
+		for foldy, m in fulldictOfResults.items():
+			for metric, numbery in m.items():
+				by_fold[metric].append(numbery)
+
+# calculate averages
+		averages = {metric: sum(metric_numbery) / len(metric_numbery) for metric, metric_numbery in by_fold.items()}
+		print averages
+		with open(save_loc + nameywamey + 'gramResultsDictAverage'+'.csv', 'wb') as csv_file:
+			writer = csv.writer(csv_file)
+			for key, value in averages.items():
+				writer.writerow([key, value])
 
 		if model == 'Logistic':	
 			print ''
@@ -277,26 +317,54 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path,
 				FP = confusion[0, 1]
 				FN = confusion[1, 0]
 				print '%d true positives,' %TP + ' %d true negatives,' %TN + ' %d false positives,' %FP + ' %d false negatives' %FN
-				false_positive_rate = FP / float(TN + FP)
-				recall = TP / float(FN + TP)
-				precision = TP / float(TP + FP)
-				specificity = TN / (TN + FP)
+				false_positive_rate = float(FP / float(TN + FP))
+				recall = float(TP / float(FN + TP))
+				precision = float(TP / float(TP + FP))
+				specificity = float(TN / float(TN + FP))
+				F1 = float(2 * float(precision * recall) / float(precision + recall))
 				print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
 				print metrics.classification_report(y_test, predicted)
 
 			if save_all_of_it:
 				save_all(dff, coef_dict, probsdict, 'logistic' +  re.findall(r'range=\(\d',str(vectorizer))[0][-1] +'gram', fold, results_path) 
-				cc=dff.sum(axis=0)
-				nameywamey=re.findall(r'range=\(\d',str(vectorizer))[0][-1]
-				cc.to_csv(save_loc + nameywamey + 'gramALLfeatureCounts')
-				print "your csv with counts for features has been created"
-				print 'it is saved here %s' %(save_loc + nameywamey + 'gramALLfeatureCounts')
+				
 
 			correct = np.mean(predicted == y_test)*100		
 			correctOnTrain = score*100
 			print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain
 
-			print '#########################################'
+			dictoResults['numbCoeff'] = len(coeffs)
+			dictoResults['numbRel'] = countsdict[1]
+			dictoResults['MostFreqClassAccNoRel'] = avgnorel
+			dictoResults['TestSetAcc'] = correct
+			dictoResults['TrainingSetAcc'] = correctOnTrain
+			dictoResults['FalsePositives'] = false_positive_rate
+			dictoResults['precisionRel'] = precision
+			dictoResults['recallRel'] = recall
+			dictoResults['DiffAcc'] = float(correct-avgnorel)
+			dictoResults['F1'] = F1
+			fulldictOfResults[str(fold)]=dictoResults
+			with open(save_loc + nameywamey + 'gramResultsDict'+'.csv', 'wb') as csv_file:
+				writer = csv.writer(csv_file)
+				for key, value in fulldictOfResults.items():
+					writer.writerow([key, value])
+
+		by_fold = defaultdict(list)
+			# aggregate to the default dict
+		for foldy, m in fulldictOfResults.items():
+			for metric, numbery in m.items():
+				by_fold[metric].append(numbery)
+
+# calculate averages
+		averages = {metric: sum(metric_numbery) / len(metric_numbery) for metric, metric_numbery in by_fold.items()}
+		print averages
+		with open(save_loc + nameywamey + 'gramResultsDictAverage'+'.csv', 'wb') as csv_file:
+			writer = csv.writer(csv_file)
+			for key, value in averages.items():
+				writer.writerow([key, value])
+
+
+	print '#########################################'
 
 
 
@@ -442,7 +510,11 @@ clear_datastructures()
 
 
 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=bigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=trigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quadgram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quintgram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 
 #listotrain=trainout['target'].tolist()
 
