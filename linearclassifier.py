@@ -91,6 +91,7 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path,
 	kf = KFold(n_splits=k_num)
 	fold = 0
 	for train_idx, test_idx in kf.split(X):
+		clear_datastructures()
 		dictoResults={}
 		fold += 1
 		X_train, X_test = X[train_idx], X[test_idx]
@@ -326,7 +327,7 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path,
 				print metrics.classification_report(y_test, predicted)
 
 			if save_all_of_it:
-				save_all(dff, coef_dict, probsdict, 'logistic' +  re.findall(r'range=\(\d',str(vectorizer))[0][-1] +'gram', fold, results_path) 
+				save_all(dff, coef_dict,'logistic' +  re.findall(r'range=\(\d',str(vectorizer))[0][-1] +'gram', fold, results_path) 
 				
 
 			correct = np.mean(predicted == y_test)*100		
@@ -363,6 +364,10 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc=results_path,
 			for key, value in averages.items():
 				writer.writerow([key, value])
 
+		with open(save_loc + nameywamey + 'gramALLRunsProbs.csv', 'wb') as f:
+			csv.writer(f).writerows((k,) + v for k, v in probsdict.iteritems())
+		print 'your Probability file for all run has printed it saved at this location: ' + save_loc + nameywamey + 'gramALLRunsProbs.csv'
+
 
 	print '#########################################'
 
@@ -397,8 +402,8 @@ def replace_with_dict(ar, dic):
     return v[sidx[np.searchsorted(k,ar,sorter=sidx)]]
 
 def clear_datastructures():
-	testout=[]
-	trainout=[]
+	X_test=[]
+	X_train=[]
 	y_test=[]
 	y_train=[]
 	coef_dict_multinom = {}
@@ -423,10 +428,9 @@ def get_example_featweights_dict(corpus_list, b, coef_list, vectorizer=bigram_ve
 	print 'your dictionary of examples to features and their weights has been created'
 	#print 'it is called %s' %b this prints your list
 
-def save_all(b, coeflist, probsdict, name, run_numb, save_loc, make_featweights=True):  #name should be the run you are using e.g., logistic no TF
+def save_all(b, coeflist, name, run_numb, save_loc, make_featweights=True):  #name should be the run you are using e.g., logistic no TF
 	namestr = save_loc + name + 'Run' + str(run_numb) + 'featweights'
 	coefnamestr = save_loc + name + 'Run' + str(run_numb) + 'coefs'
-	probsnamestr= save_loc + name + 'TestRun' + str(run_numb) + 'Probs'
 
 	print "please be patient, I am creating your output result files"
 
@@ -434,14 +438,11 @@ def save_all(b, coeflist, probsdict, name, run_numb, save_loc, make_featweights=
 		print "you ordered a feature weights file, this might take a moment"
 		b.to_csv(namestr)
 
-	with open(probsnamestr, "wb") as f:
-		csv.writer(f).writerows((k,) + v for k, v in probsdict.iteritems())
-
 	coefpddf=pd.DataFrame.from_dict(coef_dict_logistic, orient='index')
 	coefpddf.to_csv(coefnamestr)
 
 	print 'your coeff_list and feature weights for examples have been created for model %s '%name + ' run %d' %run_numb
-	print 'your files are saved as %s' %namestr + ' and %s' %coefnamestr + ' and %s' %probsnamestr
+	print 'your files are saved as %s' %namestr + ' and %s' %coefnamestr 
 
 
 
