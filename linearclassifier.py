@@ -465,6 +465,7 @@ bigram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(2, 2)) # bi
 trigram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(3, 3)) 
 quadgram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(4, 4)) 
 quintgram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(5, 5)) 
+liugram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(6, 6)) 
 
 maindata=rawdata[['target','rel_type']]
 
@@ -509,12 +510,19 @@ clear_datastructures()
 ########################
 
 
-
+clear_datastructures()
 runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+clear_datastructures()
 runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=bigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+clear_datastructures()
 runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=trigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+clear_datastructures()
 runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quadgram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+clear_datastructures()
 runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quintgram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+clear_datastructures()
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=liugram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+
 
 #listotrain=trainout['target'].tolist()
 
