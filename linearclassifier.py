@@ -50,7 +50,6 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 	listALL=data['target'].tolist()
 	countsALL = vectorizer.fit_transform(listALL)
 	arrayALL=replace_with_dict(data.rel_type.as_matrix(), reldict)
-	arrayALL
 	X, y = countsALL, arrayALL
 
 	forsavies=countsALL.toarray()
@@ -105,7 +104,7 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 		start=ll[0]
 		stop=start+len(ll)
 		listostuffs = listALL[start:stop]
-		print listostuffs, len(listostuffs)
+		
 
 
 		if model == 'MultiNomialNB':	
@@ -461,7 +460,7 @@ def save_all(b, coeflist, name, run_numb, save_loc, make_featweights=True):  #na
 raw_path = '/Users/Adina/git/Transitivity-Orthoforms/full_list_no_dash.csv'
 verbs_path = '/Users/Adina/git/Transitivity-Orthoforms/justverbs.csv'
 relnouns_path =  '/Users/Adina/git/Transitivity-Orthoforms/relnouns.csv'
-results_path = '/Users/Adina/git/Transitivity-Orthoforms/Results/'
+results_path = '/Users/Adina/git/Transitivity-Orthoforms/Results/Monomorphs/'
 
 
 rawdata=pd.read_csv(raw_path)
@@ -488,10 +487,10 @@ reldict={'rel':1, 'norel':0}
 # Running MultiNomial  #
 ########################
 
-testout=[]
-trainout=[]
-y_test=[]
-y_train=[]
+#testout=[]
+#trainout=[]
+#y_test=[]
+#y_train=[]
 #coef_dict_multinom = {}
 coef_dict_logistic ={}
 probsdict={}
@@ -517,17 +516,17 @@ clear_datastructures()
 
 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unigram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unigram_vectorizer, name_modifier= 'Monomorphemic', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=bigram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=bigram_vectorizer, name_modifier= 'Monomorphemic', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=trigram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=trigram_vectorizer, name_modifier= 'Monomorphemic', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quadgram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quadgram_vectorizer, name_modifier= 'Monomorphemic', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quintgram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quintgram_vectorizer, name_modifier= 'Monomorphemic', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=liugram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=liugram_vectorizer, name_modifier= 'Monomorphemic', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 
 
 #listotrain=trainout['target'].tolist()

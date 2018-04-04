@@ -41,7 +41,7 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 # 3 bools about whether to print test stats, or selected things
 # a number for how many selected things you want to see
 # a bool corresponding to printing the top X of features ('listofeats', and a number, corresponding to items the list should contain (or the string 'all'). 
-
+	listofeats=[]
 	listotrain = traindata['target'].tolist() # this will be a list of all the words you fed in
 	trainarray = traindata.rel_type.as_matrix() # this will be a list of codings that correspond to the words
 	traincounts = vectorizer.fit_transform(listotrain) #reads in test data and makes the relevant data structures, i.e., all the bigrams, trigrams etc.
@@ -132,7 +132,7 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 		if print_stats: 
 
 			print 'these are the counts in each condition:'
-			unique, counts = np.unique(y_test, return_counts=True)
+			unique, counts = np.unique(testarray, return_counts=True)
 			countsdict = dict(zip(unique, counts))
 			rels = countsdict.get('rel', 'n/a').astype(float)
 			norels = countsdict.get('norel', 'n/a').astype(float)
@@ -143,7 +143,7 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 			print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
 			print '#########################################'
 
-			confusion = metrics.confusion_matrix(y_test, predicted)
+			confusion = metrics.confusion_matrix(testarray, predicted)
 			TP = confusion[1, 1]
 			TN = confusion[0, 0]
 			FP = confusion[0, 1]
@@ -154,7 +154,7 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 			precision = TP / float(TP + FP)
 			specificity = TN / (TN + FP)
 			print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
-			print metrics.classification_report(y_test, predicted)
+			print metrics.classification_report(testarray, predicted)
 # some print statements #
 		
 		correct = np.mean(predicted == testarray)*100		
@@ -237,7 +237,7 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 		if print_stats: 
 
 			print 'these are the counts in each condition:'
-			unique, counts = np.unique(replace_with_dict(y_test, reldict), return_counts=True)
+			unique, counts = np.unique(replace_with_dict(testarray, reldict), return_counts=True)
 			countsdict = dict(zip(unique, counts))
 			rels = countsdict.get(1, 2) # made 2 an elsewhere number here...hope that works
 			norels = countsdict.get(0, 2)
@@ -248,7 +248,7 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 			print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
 			print '#########################################'
 
-			confusion = metrics.confusion_matrix(replace_with_dict(y_test, reldict), predicted)
+			confusion = metrics.confusion_matrix(replace_with_dict(testarray, reldict), predicted)
 			TP = confusion[1, 1]
 			TN = confusion[0, 0]
 			FP = confusion[0, 1]
@@ -259,7 +259,7 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 			precision = TP / float(TP + FP)
 			specificity = TN / (TN + FP)
 			print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
-			print metrics.classification_report(replace_with_dict(y_test, reldict), predicted)
+			print metrics.classification_report(replace_with_dict(testarray, reldict), predicted)
 
 		correct = np.mean(predicted == replace_with_dict(testarray, reldict))*100		
 		correctOnTrain = score*100
@@ -380,6 +380,7 @@ relnounies = relnouns[['target','rel_type']]
 nouns=pd.read_csv(nouns_path)
 
 reldict={'rel':1, 'norel':0}
+
 
 ########################
 # Running MultiNomial  #
