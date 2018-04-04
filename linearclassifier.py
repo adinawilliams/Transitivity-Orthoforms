@@ -35,7 +35,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 #########################################
 
 
-def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, model='Logistic', print_coeffdict=True, print_probs=True, print_testall=False, print_stats=False, print_sel=False, save_all_of_it=True, sel_numb=10, k_num=5, coeff_numb=10, tfidf_transform=False, tf_transform=False): 
+def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, name_modifier, model='Logistic', print_coeffdict=True, print_probs=True, print_testall=False, print_stats=False, print_sel=False, save_all_of_it=True, sel_numb=10, k_num=5, coeff_numb=10, tfidf_transform=False, tf_transform=False): 
 # two pandas df
 # 'coef_dict' tells you where to write the dictionary that links features to their model coefficients; features get written to 'listofeats'
 # the name of a vectorizer, binary, trinary etc.; need to be externally defined
@@ -60,9 +60,9 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 	cc=dff.sum(axis=0)
 	nameywamey=re.findall(r'range=\(\d',str(vectorizer))[0][-1]
 	print 'I am printing the counts for all your n-grams, be patient; this might take a hot min.'
-	cc.to_csv(save_loc + nameywamey + 'gramALLfeatureCounts')
+	cc.to_csv(save_loc  + name_modifier +nameywamey +'gramALLfeatureCounts')
 	print "your csv with counts for features has been created"
-	print 'it is saved here %s' %(save_loc + nameywamey + 'gramALLfeatureCounts')
+	print 'it is saved here %s' %(save_loc + name_modifier+ nameywamey + 'gramALLfeatureCounts')
 
 	print ''
 	print ''
@@ -105,6 +105,7 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 		start=ll[0]
 		stop=start+len(ll)
 		listostuffs = listALL[start:stop]
+		print listostuffs, len(listostuffs)
 
 
 		if model == 'MultiNomialNB':	
@@ -210,7 +211,7 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 			dictoResults['DiffAcc'] = float(correct-avgnorel)
 			dictoResults['F1'] = F1
 			fulldictOfResults[str(fold)]=dictoResults
-			with open(save_loc + nameywamey + 'gramResultsDict'+'.csv', 'wb') as csv_file:
+			with open(save_loc +  name_modifier+ nameywamey + 'gramResultsDict'+'.csv', 'wb') as csv_file:
 				writer = csv.writer(csv_file)
 				for key, value in fulldictOfResults.items():
 					writer.writerow([key, value])
@@ -224,7 +225,7 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 # calculate averages
 		averages = {metric: sum(metric_numbery) / len(metric_numbery) for metric, metric_numbery in by_fold.items()}
 		print averages
-		with open(save_loc + nameywamey + 'gramResultsDictAverage'+'.csv', 'wb') as csv_file:
+		with open(save_loc +  name_modifier+ nameywamey + 'gramResultsDictAverage'+'.csv', 'wb') as csv_file:
 			writer = csv.writer(csv_file)
 			for key, value in averages.items():
 				writer.writerow([key, value])
@@ -332,7 +333,7 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 				print metrics.classification_report(y_test, predicted)
 
 			if save_all_of_it:
-				save_all(dff, coef_dict,'logistic' +  re.findall(r'range=\(\d',str(vectorizer))[0][-1] +'gram', fold, results_path) 
+				save_all(dff, coef_dict, name_modifier + 'logistic' +  re.findall(r'range=\(\d',str(vectorizer))[0][-1] +'gram', fold, results_path) 
 				
 
 			correct = np.mean(predicted == y_test)*100		
@@ -364,14 +365,14 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 # calculate averages
 		averages = {metric: sum(metric_numbery) / len(metric_numbery) for metric, metric_numbery in by_fold.items()}
 		print averages
-		with open(save_loc + nameywamey + 'gramResultsDictAverage'+'.csv', 'wb') as csv_file:
+		with open(save_loc  + name_modifier+ nameywamey + 'gramResultsDictAverage'+'.csv', 'wb') as csv_file:
 			writer = csv.writer(csv_file)
 			for key, value in averages.items():
 				writer.writerow([key, value])
 
-		with open(save_loc + nameywamey + 'gramALLRunsProbs.csv', 'wb') as f:
+		with open(save_loc  + name_modifier+ nameywamey + 'gramALLRunsProbs.csv', 'wb') as f:
 			csv.writer(f).writerows((k,) + v for k, v in probsdict.iteritems())
-		print 'your Probability file for all run has printed it saved at this location: ' + save_loc + nameywamey + 'gramALLRunsProbs.csv'
+		print 'your Probability file for all run has printed it saved at this location: ' + save_loc +  name_modifier+ nameywamey + 'gramALLRunsProbs.csv'
 
 
 	print '#########################################'
@@ -458,8 +459,8 @@ def save_all(b, coeflist, name, run_numb, save_loc, make_featweights=True):  #na
 
 
 raw_path = '/Users/Adina/git/Transitivity-Orthoforms/full_list_no_dash.csv'
-verbs_path = '/Users/Adina/Documents/Orthographic Forms/justverbs.csv'
-relnouns_path =  '/Users/Adina/Documents/Orthographic Forms/relnouns.csv'
+verbs_path = '/Users/Adina/git/Transitivity-Orthoforms/justverbs.csv'
+relnouns_path =  '/Users/Adina/git/Transitivity-Orthoforms/relnouns.csv'
 results_path = '/Users/Adina/git/Transitivity-Orthoforms/Results/'
 
 
@@ -516,17 +517,17 @@ clear_datastructures()
 
 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unigram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=bigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=bigram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=trigram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=trigram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quadgram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quadgram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quintgram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quintgram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=liugram_vectorizer, model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=liugram_vectorizer, name_modifier= '', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 
 
 #listotrain=trainout['target'].tolist()

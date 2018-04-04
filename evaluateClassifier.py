@@ -77,3 +77,41 @@ for i in xrange(1,7):
 
 # make_commons(path,6, 20)
 # get_topn(path, 6, 15)
+
+probs6= pd.read_csv(path+'6gramALLRunsProbs.csv',header=-1)
+probs6.columns=['n-gram','PNoRel','PRel']
+probs5= pd.read_csv(path+'5gramALLRunsProbs.csv',header=-1)
+probs5.columns=['n-gram','PNoRel','PRel']
+probs4= pd.read_csv(path+'4gramALLRunsProbs.csv',header=-1)
+probs4.columns=['n-gram','PNoRel','PRel']
+probs3= pd.read_csv(path+'3gramALLRunsProbs.csv',header=-1)
+probs3.columns=['n-gram','PNoRel','PRel']
+probs2= pd.read_csv(path+'2gramALLRunsProbs.csv',header=-1)
+probs2.columns=['n-gram','PNoRel','PRel']
+probs1= pd.read_csv(path+'1gramALLRunsProbs.csv',header=-1)
+probs1.columns=['n-gram','PNoRel','PRel']
+
+probslist=[probs6,probs5,probs4,probs3,probs2,probs1]
+
+county=0
+for j in probslist:
+	county+=1
+	j.sort_values(['PRel'], ascending=False, inplace=True)
+	heads=j.head(20)
+	tails=j.tail(20)
+	wordslist=pd.concat([heads,tails])
+	print 'wordslist for %s grams' %county
+	print wordslist
+
+featwe1=pd.read_csv(path+'logistic1gramRun5featweights')
+featwe2=pd.read_csv(path+'logistic2gramRun5featweights')
+print '2gram feat weights loaded'
+featwe3=pd.read_csv(path+'logistic3gramRun5featweights')
+print '3gram feat weights loaded'
+featwe4=pd.read_csv(path+'logistic4gramRun5featweights')
+print '4gram feat weights loaded'
+featwe5=pd.read_csv(path+'logistic5gramRun5featweights')
+print '5gram feat weights loaded'
+featwe6=pd.read_csv(path+'logistic6gramRun5featweights')
+print '6gram feat weights loaded'
+print 'all feat weights loaded'

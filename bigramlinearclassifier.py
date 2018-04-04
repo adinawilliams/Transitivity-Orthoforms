@@ -92,10 +92,13 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 
 		coeffs = clf2.coef_[0]
 
-		for coef, feat in zip(abs(clf2.coef_[0]),features):  # should give a dictionary of features and their contribution based on coeffs
+		for coef, feat in zip(clf2.coef_[0],features):  # should give a dictionary of features and their contribution based on coeffs
 		# I also take the absolute value b/c that tells you which features contribute more, but not whether it's to rel or norel; 
 		# on the assumption that all features are comparable which I think is well motivated based on this dataset.
 			coef_dict[feat] = coef
+
+		# keep the sign...sadness
+
 
 		if coeff_numb=='all':
 			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
@@ -194,7 +197,7 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 
 		coeffs = clf2.coef_[0]
 
-		for coef, feat in zip(abs(clf2.coef_[0]),features):  # should give a dictionary of features and their contribution based on coeffs
+		for coef, feat in zip(clf2.coef_[0],features):  # should give a dictionary of features and their contribution based on coeffs
 		# I also take the absolute value b/c that tells you which features contribute more; on the assumption that all features are comparable
 		# which I think is well motivated based on this dataset.
 			coef_dict[feat] = coef
@@ -321,7 +324,7 @@ def get_example_featweights_dict(corpus_list, b, coef_list, vectorizer=bigram_ve
 	print 'your dictionary of examples to features and their weights has been created'
 	#print 'it is called %s' %b this prints your list
 
-def save_all(b, coeflist, probsdict, name, run_numb, save_loc, make_featweights=False):  #name should be the run you are using e.g., logistic no TF
+def save_all(b, coeflist, probsdict, name, run_numb, save_loc, make_featweights=True):  #name should be the run you are using e.g., logistic no TF
 	namestr = save_loc + name + 'Run' + str(run_numb) + 'featweights'
 	coefnamestr = save_loc + name + 'Run' + str(run_numb) + 'coefs'
 	probsnamestr= save_loc + name + 'TestRun' + str(run_numb) + 'Probs'
@@ -351,8 +354,9 @@ def save_all(b, coeflist, probsdict, name, run_numb, save_loc, make_featweights=
 
 
 raw_path = '/Users/Adina/git/Transitivity-Orthoforms/full_list_no_dash.csv'
-verbs_path = '/Users/Adina/Documents/Orthographic Forms/justverbs.csv'
-relnouns_path =  '/Users/Adina/Documents/Orthographic Forms/relnouns.csv'
+verbs_path = '/Users/Adina/git/Transitivity-Orthoforms/justverbs.csv'
+relnouns_path =  '/Users/Adina/git/Transitivity-Orthoforms/relnouns.csv'
+nouns_path = '/Users/Adina/git/Transitivity-Orthoforms/teststimsnouns.csv'
 results_path = '/Users/Adina/git/Transitivity-Orthoforms/Results/'
 
 
@@ -372,6 +376,8 @@ verbies = verbs[['target','rel_type']]
 
 relnouns = pd.read_csv(relnouns_path)
 relnounies = relnouns[['target','rel_type']]
+
+nouns=pd.read_csv(nouns_path)
 
 reldict={'rel':1, 'norel':0}
 
@@ -423,7 +429,6 @@ save_all(x, coef_dict_logistic, probsdict, 'logistic4GramNoTF', 4, results_path)
 
  
 # TODO for tomorrow:
-
 
 
 

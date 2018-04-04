@@ -8,6 +8,7 @@ from sklearn import *
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 
+
 raw_path = '/Users/Adina/Documents/Orthographic Forms/celex_valex_stats.csv'
 stimlistpath = '/Users/Adina/Documents/Orthographic Forms/Stim_final.csv'
 
