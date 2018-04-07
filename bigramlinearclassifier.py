@@ -13,6 +13,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn import datasets, linear_model
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import BaggingClassifier
 from sklearn import metrics
 from operator import itemgetter
 
@@ -33,7 +34,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 #########################################
 
 
-def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectorizer=bigram_vectorizer, model='Logistic', print_coeffdict=True, print_probs=True, print_testall=False, print_stats=False, print_sel=False, sel_numb=10, coeff_numb=10, tfidf_transform=False, tf_transform=False): 
+def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectorizer=bigram_vectorizer, model='Logistic', print_coeffdict=True, print_probs=True, print_testall=False, print_stats=False, print_sel=False, sel_numb=10, coeff_numb=10, bags_num=10000, bags=True, tfidf_transform=False, tf_transform=False): 
 # two pandas df
 # 'coef_dict' tells you where to write the dictionary that links features to their model coefficients; features get written to 'listofeats'
 # the name of a vectorizer, binary, trinary etc.; need to be externally defined
@@ -42,6 +43,7 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 # a number for how many selected things you want to see
 # a bool corresponding to printing the top X of features ('listofeats', and a number, corresponding to items the list should contain (or the string 'all'). 
 	listofeats=[]
+	coeffs=[]
 	listotrain = traindata['target'].tolist() # this will be a list of all the words you fed in
 	trainarray = traindata.rel_type.as_matrix() # this will be a list of codings that correspond to the words
 	traincounts = vectorizer.fit_transform(listotrain) #reads in test data and makes the relevant data structures, i.e., all the bigrams, trigrams etc.
@@ -80,86 +82,177 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 		print '#########################################'
 		print '#########################################'
 		print ''
-		clf2 = MultinomialNB().fit(traincounts,trainarray) #fitting the Multinomial classifier
-		score = clf2.score(traincounts, trainarray) 
-		predicted = clf2.predict(testcounts)
-		probs = clf2.predict_proba(testcounts)
 
-		if print_probs:
-			prlist = list(map(tuple, probs))
-			for i in listotest:
-				probsdict[i]=prlist[i]
+		if bags:
+			print 'you ordered bags! There will be %d bootstrapped resampling steps' %bags_num
+			print 'sorry friendo, this might take a while...'
+			bags=BaggingClassifier(LogisticRegression(), bootstrap=True, max_samples=0.5, max_features=0.5, oob_score=True, n_estimators=bags_num)
+			bags.fit(traincounts,replace_with_dict(trainarray, reldict)) #fitting the Logistic classifier, and recoding
+			print bags.oob_score_
+			print "that was the oob score"
+			clf = LogisticRegression().fit(traincounts,replace_with_dict(trainarray, reldict)) 
+			score = bags.score(traincounts, replace_with_dict(trainarray, reldict)) 
+			oobscore= bags.oob_score_
+			predicted = bags.predict(testcounts)
+			probs = bags.predict_proba(testcounts)
 
-		coeffs = clf2.coef_[0]
+			if print_probs:
+				prlist = list(map(tuple, probs))
+				for i in listotest:
+					probsdict[i]=prlist[i]
 
-		for coef, feat in zip(clf2.coef_[0],features):  # should give a dictionary of features and their contribution based on coeffs
-		# I also take the absolute value b/c that tells you which features contribute more, but not whether it's to rel or norel; 
-		# on the assumption that all features are comparable which I think is well motivated based on this dataset.
-			coef_dict[feat] = coef
+			coeffs = clf.coef_[0]
 
-		# keep the sign...sadness
+			for coef, feat in zip(clf.coef_[0],features):  # should give a dictionary of features and their contribution based on coeffs
+			# I also take the absolute value b/c that tells you which features contribute more, but not whether it's to rel or norel; 
+			# on the assumption that all features are comparable which I think is well motivated based on this dataset.
+				coef_dict[feat] = coef
 
-
-		if coeff_numb=='all':
-			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
-		else:
-			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb]))
-
-
-		if print_coeffdict:
-			print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
-			print len(listofeats)
-			print listofeats
+			# keep the sign...sadness
 
 
-	# some optional print statements #
+			if coeff_numb=='all':
+				listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
+			else:
+				listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb]))
 
-		if print_testall:
-			for word, relthing in zip(listotest, predicted):
-				print ('%r => %s' % (word, relthing))
 
-		if print_sel:
-			print('First %s examples' %sel_numb, listotest[0:sel_numb])
-			print('GroundTruth:', testarray[0:sel_numb])
-			print('Predicted:', predicted[0:sel_numb])
-			print('Probabilities, for test predictions', probs[0:sel_numb])
+			if print_coeffdict:
+				print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
+				print len(listofeats)
+				print listofeats
+
+
+		# some optional print statements #
+
+			if print_testall:
+				for word, relthing in zip(listotest, predicted):
+					print ('%r => %s' % (word, relthing))
+
+			if print_sel:
+				print('First %s examples' %sel_numb, listotest[0:sel_numb])
+				print('GroundTruth:', testarray[0:sel_numb])
+				print('Predicted:', predicted[0:sel_numb])
+				print('Probabilities, for test predictions', probs[0:sel_numb])
+				print '#########################################'
+				#print('Coeffs for features', coef_dict)
+				print('number of coefficients found', len(coeffs)) 
+				print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
+				#sanity check, bigram vectorizer makes around 618 features, depending on the test train split
 			print '#########################################'
-			#print('Coeffs for features', coef_dict)
-			print('number of coefficients found', len(coeffs)) 
-			print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
-			#sanity check, bigram vectorizer makes around 618 features, depending on the test train split
-		print '#########################################'
-		if print_stats: 
+			if print_stats: 
 
-			print 'these are the counts in each condition:'
-			unique, counts = np.unique(testarray, return_counts=True)
-			countsdict = dict(zip(unique, counts))
-			rels = countsdict.get('rel', 'n/a').astype(float)
-			norels = countsdict.get('norel', 'n/a').astype(float)
-			tot= (rels+norels).astype(float)
-			avgrel = np.multiply(np.divide(rels, tot),100)
-			avgnorel = np.multiply(np.divide(norels, tot),100)
-			print countsdict
-			print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
+				print 'these are the counts in each condition:'
+				unique, counts = np.unique(testarray, return_counts=True)
+				countsdict = dict(zip(unique, counts))
+				rels = countsdict.get('rel', 'n/a').astype(float)
+				norels = countsdict.get('norel', 'n/a').astype(float)
+				tot= (rels+norels).astype(float)
+				avgrel = np.multiply(np.divide(rels, tot),100)
+				avgnorel = np.multiply(np.divide(norels, tot),100)
+				print countsdict
+				print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
+				print '#########################################'
+
+				confusion = metrics.confusion_matrix(testarray, predicted)
+				TP = confusion[1, 1]
+				TN = confusion[0, 0]
+				FP = confusion[0, 1]
+				FN = confusion[1, 0]
+				print '%d true positives,' %TP + ' %d true negatives,' %TN + ' %d false positives,' %FP + ' %d false negatives' %FN
+				false_positive_rate = FP / float(TN + FP)
+				recall = TP / float(FN + TP)
+				precision = TP / float(TP + FP)
+				specificity = TN / (TN + FP)
+				print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
+				print metrics.classification_report(testarray, predicted)
+	# some print statements #
+			
+			correct = np.mean(predicted == testarray)*100		
+			correctOnTrain = score*100
+			print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain + ' and out of bag score is %d' %oobscore
+
+		else: 
+			clf2 = MultinomialNB().fit(traincounts,trainarray) #fitting the Multinomial classifier
+			score = clf2.score(traincounts, trainarray) 
+			predicted = clf2.predict(testcounts)
+			probs = clf2.predict_proba(testcounts)
+
+			if print_probs:
+				prlist = list(map(tuple, probs))
+				for i in listotest:
+					probsdict[i]=prlist[i]
+
+			coeffs = clf2.coef_[0]
+
+			for coef, feat in zip(clf2.coef_[0],features):  # should give a dictionary of features and their contribution based on coeffs
+			# I also take the absolute value b/c that tells you which features contribute more, but not whether it's to rel or norel; 
+			# on the assumption that all features are comparable which I think is well motivated based on this dataset.
+				coef_dict[feat] = coef
+
+			# keep the sign...sadness
+
+
+			if coeff_numb=='all':
+				listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
+			else:
+				listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb]))
+
+
+			if print_coeffdict:
+				print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
+				print len(listofeats)
+				print listofeats
+
+
+		# some optional print statements #
+
+			if print_testall:
+				for word, relthing in zip(listotest, predicted):
+					print ('%r => %s' % (word, relthing))
+
+			if print_sel:
+				print('First %s examples' %sel_numb, listotest[0:sel_numb])
+				print('GroundTruth:', testarray[0:sel_numb])
+				print('Predicted:', predicted[0:sel_numb])
+				print('Probabilities, for test predictions', probs[0:sel_numb])
+				print '#########################################'
+				#print('Coeffs for features', coef_dict)
+				print('number of coefficients found', len(coeffs)) 
+				print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
+				#sanity check, bigram vectorizer makes around 618 features, depending on the test train split
 			print '#########################################'
+			if print_stats: 
 
-			confusion = metrics.confusion_matrix(testarray, predicted)
-			TP = confusion[1, 1]
-			TN = confusion[0, 0]
-			FP = confusion[0, 1]
-			FN = confusion[1, 0]
-			print '%d true positives,' %TP + ' %d true negatives,' %TN + ' %d false positives,' %FP + ' %d false negatives' %FN
-			false_positive_rate = FP / float(TN + FP)
-			recall = TP / float(FN + TP)
-			precision = TP / float(TP + FP)
-			specificity = TN / (TN + FP)
-			print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
-			print metrics.classification_report(testarray, predicted)
-# some print statements #
-		
-		correct = np.mean(predicted == testarray)*100		
-		correctOnTrain = score*100
-		print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain
+				print 'these are the counts in each condition:'
+				unique, counts = np.unique(testarray, return_counts=True)
+				countsdict = dict(zip(unique, counts))
+				rels = countsdict.get('rel', 'n/a').astype(float)
+				norels = countsdict.get('norel', 'n/a').astype(float)
+				tot= (rels+norels).astype(float)
+				avgrel = np.multiply(np.divide(rels, tot),100)
+				avgnorel = np.multiply(np.divide(norels, tot),100)
+				print countsdict
+				print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
+				print '#########################################'
+
+				confusion = metrics.confusion_matrix(testarray, predicted)
+				TP = confusion[1, 1]
+				TN = confusion[0, 0]
+				FP = confusion[0, 1]
+				FN = confusion[1, 0]
+				print '%d true positives,' %TP + ' %d true negatives,' %TN + ' %d false positives,' %FP + ' %d false negatives' %FN
+				false_positive_rate = FP / float(TN + FP)
+				recall = TP / float(FN + TP)
+				precision = TP / float(TP + FP)
+				specificity = TN / (TN + FP)
+				print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
+				print metrics.classification_report(testarray, predicted)
+	# some print statements #
+			
+			correct = np.mean(predicted == testarray)*100		
+			correctOnTrain = score*100
+			print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain + " and you didn't order a bags score" 
 
 
 	if model == 'Logistic':	
@@ -176,96 +269,186 @@ def runClassifier(traindata, testdata, coef_dict, probsdict, listofeats, vectori
 
 		reldict={'rel':1, 'norel':0}
 		#return len(vectorizer.fit_transform(listotrain).toarray())
+		if bags:
+			print 'you ordered bags! There will be %d bootstrapped resampling steps' %bags_num
+			print 'sorry friendo, this might take a while...'
+			bags=BaggingClassifier(LogisticRegression(), bootstrap=True, max_samples=0.5, max_features=0.5, oob_score=True, n_estimators=bags_num)
+			bags.fit(traincounts,replace_with_dict(trainarray, reldict)) #fitting the Logistic classifier, and recoding
+			print bags.oob_score_
+			oobscore= bags.oob_score_
+			print "that was the oob score"
+			clf = LogisticRegression().fit(traincounts,replace_with_dict(trainarray, reldict)) 
+			score = bags.score(traincounts, replace_with_dict(trainarray, reldict)) 
+			predicted = bags.predict(testcounts)
+			probs = bags.predict_proba(testcounts)
 
-		clf2 = LogisticRegression().fit(traincounts,replace_with_dict(trainarray, reldict)) #fitting the Logistic classifier, and recoding
-		score = clf2.score(traincounts, replace_with_dict(trainarray, reldict)) 
-		predicted = clf2.predict(testcounts)
-		probs = clf2.predict_proba(testcounts)
-		
-
-		# to plot
-		# testout['rel_type'] = testout['rel_type'].map(reldict)
-		# y_pred_prob = clf2.predict_proba(testcounts)[:, 0]
-		# plt.rcParams['font.size'] = 12
-		# plt.hist(y_pred_prob, bins=8)
-		# plt.xlim(0,1)
-		# plt.title('Histogram of predicted probabilities')
-		# plt.xlabel('Predicted probability of non-relationality')
-		# plt.ylabel('Frequency')
-		# plt.show()
-
-
-		coeffs = clf2.coef_[0]
-
-		for coef, feat in zip(clf2.coef_[0],features):  # should give a dictionary of features and their contribution based on coeffs
-		# I also take the absolute value b/c that tells you which features contribute more; on the assumption that all features are comparable
-		# which I think is well motivated based on this dataset.
-			coef_dict[feat] = coef
+			# to plot
+			# testout['rel_type'] = testout['rel_type'].map(reldict)
+			# y_pred_prob = clf2.predict_proba(testcounts)[:, 0]
+			# plt.rcParams['font.size'] = 12
+			# plt.hist(y_pred_prob, bins=8)
+			# plt.xlim(0,1)
+			# plt.title('Histogram of predicted probabilities')
+			# plt.xlabel('Predicted probability of non-relationality')
+			# plt.ylabel('Frequency')
+			# plt.show()
 
 
-		if coeff_numb=='all':
-			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
+			coeffs = clf.coef_[0] # I'm not really sure what this does...it give coef for one run of the classifier I think, as opposed to all
+
+			for coef, feat in zip(clf.coef_[0],features):  # should give a dictionary of features and their contribution based on coeffs
+			# I also take the absolute value b/c that tells you which features contribute more; on the assumption that all features are comparable
+			# which I think is well motivated based on this dataset.
+				coef_dict[feat] = coef
+
+
+			if coeff_numb=='all':
+				listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
+			else:
+				listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb]))
+
+
+			if print_coeffdict:
+				print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
+				print listofeats
+
+			if print_testall:
+				for word, relthing in zip(listotest, predicted):
+					print ('%r => %s' % (word, relthing))
+
+			if print_probs:
+				prlist = list(map(tuple, probs))
+				for i in xrange(len(listotest)):
+					probsdict[listotest[i]]=prlist[i]
+
+
+			if print_sel:
+				print('First %s examples' %sel_numb, listotest[0:sel_numb])
+				print('GroundTruth:', replace_with_dict(testarray, reldict)[0:sel_numb])
+				print('Predicted:', predicted[0:sel_numb])
+				print('Probabilities, , for test predictions', probs[0:sel_numb])
+				print '#########################################'
+				# print('Coeffs for features', coeffs)
+				print('number of coefficients found', len(coeffs)) # e.g., sanity check, bigram vectorizer makes 618 features
+				print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
+				print '#########################################'
+
+			if print_stats: 
+
+				print 'these are the counts in each condition:'
+				unique, counts = np.unique(replace_with_dict(testarray, reldict), return_counts=True)
+				countsdict = dict(zip(unique, counts))
+				rels = countsdict.get(1, 2) # made 2 an elsewhere number here...hope that works
+				norels = countsdict.get(0, 2)
+				tot= (rels+norels).astype(float)
+				avgrel = np.multiply(np.divide(rels, tot),100)
+				avgnorel = np.multiply(np.divide(norels, tot),100)
+				print countsdict
+				print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
+				print '#########################################'
+
+				confusion = metrics.confusion_matrix(replace_with_dict(testarray, reldict), predicted)
+				TP = confusion[1, 1]
+				TN = confusion[0, 0]
+				FP = confusion[0, 1]
+				FN = confusion[1, 0]
+				print '%d true positives,' %TP + ' %d true negatives,' %TN + ' %d false positives,' %FP + ' %d false negatives' %FN
+				false_positive_rate = FP / float(TN + FP)
+				recall = TP / float(FN + TP)
+				precision = TP / float(TP + FP)
+				specificity = TN / (TN + FP)
+				print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
+				print metrics.classification_report(replace_with_dict(testarray, reldict), predicted)
+
+			correct = np.mean(predicted == replace_with_dict(testarray, reldict))*100		
+			correctOnTrain = score*100
+			print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain + ' and out of bag score is %d' %oobscore
+
+			print '#########################################'
+
 		else:
-			listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb]))
+			print 'you did not order any bags, so sad!' 
+			clf2 = Logistic().fit(traincounts,trainarray) #fitting the Multinomial classifier
+			score = clf2.score(traincounts, trainarray) 
+			oobscore= clf2.oob_score_
+			predicted = clf2.predict(testcounts)
+			probs = clf2.predict_proba(testcounts)
+
+			if print_probs:
+				prlist = list(map(tuple, probs))
+				for i in listotest:
+					probsdict[i]=prlist[i]
+
+			coeffs = clf2.coef_[0]
+
+			for coef, feat in zip(clf2.coef_[0],features):  # should give a dictionary of features and their contribution based on coeffs
+			# I also take the absolute value b/c that tells you which features contribute more, but not whether it's to rel or norel; 
+			# on the assumption that all features are comparable which I think is well motivated based on this dataset.
+				coef_dict[feat] = coef
+
+			# keep the sign...sadness
 
 
-		if print_coeffdict:
-			print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
-			print listofeats
-
-		if print_testall:
-			for word, relthing in zip(listotest, predicted):
-				print ('%r => %s' % (word, relthing))
-
-		if print_probs:
-			prlist = list(map(tuple, probs))
-			for i in xrange(len(listotest)):
-				probsdict[listotest[i]]=prlist[i]
+			if coeff_numb=='all':
+				listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:]))
+			else:
+				listofeats.extend(list(sorted(coef_dict.iteritems(), key=itemgetter(1), reverse=True)[:coeff_numb]))
 
 
-		if print_sel:
-			print('First %s examples' %sel_numb, listotest[0:sel_numb])
-			print('GroundTruth:', replace_with_dict(testarray, reldict)[0:sel_numb])
-			print('Predicted:', predicted[0:sel_numb])
-			print('Probabilities, , for test predictions', probs[0:sel_numb])
+			if print_coeffdict:
+				print 'your requested number of coefficients is being printed, i.e., the top %s' %coeff_numb
+				print len(listofeats)
+				print listofeats
+
+
+		# some optional print statements #
+
+			if print_testall:
+				for word, relthing in zip(listotest, predicted):
+					print ('%r => %s' % (word, relthing))
+
+			if print_sel:
+				print('First %s examples' %sel_numb, listotest[0:sel_numb])
+				print('GroundTruth:', testarray[0:sel_numb])
+				print('Predicted:', predicted[0:sel_numb])
+				print('Probabilities, for test predictions', probs[0:sel_numb])
+				print '#########################################'
+				#print('Coeffs for features', coef_dict)
+				print('number of coefficients found', len(coeffs)) 
+				print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
+				#sanity check, bigram vectorizer makes around 618 features, depending on the test train split
 			print '#########################################'
-			# print('Coeffs for features', coeffs)
-			print('number of coefficients found', len(coeffs)) # e.g., sanity check, bigram vectorizer makes 618 features
-			print('number of coefficients equals number of features? %s' %(len(coeffs)==len(features)))
-			print '#########################################'
+			if print_stats: 
 
-		if print_stats: 
+				print 'these are the counts in each condition:'
+				unique, counts = np.unique(testarray, return_counts=True)
+				countsdict = dict(zip(unique, counts))
+				rels = countsdict.get('rel', 'n/a').astype(float)
+				norels = countsdict.get('norel', 'n/a').astype(float)
+				tot= (rels+norels).astype(float)
+				avgrel = np.multiply(np.divide(rels, tot),100)
+				avgnorel = np.multiply(np.divide(norels, tot),100)
+				print countsdict
+				print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
+				print '#########################################'
 
-			print 'these are the counts in each condition:'
-			unique, counts = np.unique(replace_with_dict(testarray, reldict), return_counts=True)
-			countsdict = dict(zip(unique, counts))
-			rels = countsdict.get(1, 2) # made 2 an elsewhere number here...hope that works
-			norels = countsdict.get(0, 2)
-			tot= (rels+norels).astype(float)
-			avgrel = np.multiply(np.divide(rels, tot),100)
-			avgnorel = np.multiply(np.divide(norels, tot),100)
-			print countsdict
-			print '%f percent norel (null accuracy),' %avgnorel + ' and %f percent rel;' %avgrel +  ' %d is the total count used for testing' %(rels+norels)
-			print '#########################################'
-
-			confusion = metrics.confusion_matrix(replace_with_dict(testarray, reldict), predicted)
-			TP = confusion[1, 1]
-			TN = confusion[0, 0]
-			FP = confusion[0, 1]
-			FN = confusion[1, 0]
-			print '%d true positives,' %TP + ' %d true negatives,' %TN + ' %d false positives,' %FP + ' %d false negatives' %FN
-			false_positive_rate = FP / float(TN + FP)
-			recall = TP / float(FN + TP)
-			precision = TP / float(TP + FP)
-			specificity = TN / (TN + FP)
-			print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
-			print metrics.classification_report(replace_with_dict(testarray, reldict), predicted)
-
-		correct = np.mean(predicted == replace_with_dict(testarray, reldict))*100		
-		correctOnTrain = score*100
-		print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain
-
-		print '#########################################'
+				confusion = metrics.confusion_matrix(testarray, predicted)
+				TP = confusion[1, 1]
+				TN = confusion[0, 0]
+				FP = confusion[0, 1]
+				FN = confusion[1, 0]
+				print '%d true positives,' %TP + ' %d true negatives,' %TN + ' %d false positives,' %FP + ' %d false negatives' %FN
+				false_positive_rate = FP / float(TN + FP)
+				recall = TP / float(FN + TP)
+				precision = TP / float(TP + FP)
+				specificity = TN / (TN + FP)
+				print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
+				print metrics.classification_report(testarray, predicted)
+	# some print statements #
+			
+			correct = np.mean(predicted == testarray)*100		
+			correctOnTrain = score*100
+			print '%f percent correct on test set' %correct + ' and %f percent correct on training set' %correctOnTrain + " and you didn't order an outta bags score" 
 
 
 

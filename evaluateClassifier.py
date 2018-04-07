@@ -77,6 +77,13 @@ for i in xrange(1,7):
 
 # make_commons(path,6, 20)
 # get_topn(path, 6, 15)
+get_topn(path, 1, 15)
+get_topn(path, 2, 15)
+get_topn(path, 3, 15)
+get_topn(path, 4, 15)
+get_topn(path, 5, 15)
+get_topn(path, 6, 15)
+
 
 probs6= pd.read_csv(path+'6gramALLRunsProbs.csv',header=-1)
 probs6.columns=['n-gram','PNoRel','PRel']
