@@ -50,9 +50,54 @@ def make_commons(path, gramsize, n_int): #n_int is the fewest number of instance
 	ddff.to_csv(path+str(gramsize)+'gramALLfeatureCountsCommons.csv')
 	print len(ddff)
 
+
+def get_right_wrong(path, testname, goldlab_filename, print_true):
+	fin=[]
+	cert=[]
+	pred=[]
+	df=pd.read_csv(path+testname +'.csv', header=-1)
+	df.columns=['target','norelPred', 'relPred']
+	goldlab=pd.read_csv(path+goldlab_filename)
+	fin=pd.merge(goldlab,df, on='target')
+	fin=fin[['target', 'rel_type','relPred']]
+	for i in fin.relPred:
+		cert.append(abs(float(0.5-i)))
+		if i>0.5:
+			pred.append('rel')
+		else:
+			pred.append('norel')
+	fin['certainty']=cert
+	fin['prediction']=pred
+	fin=fin[['target','rel_type','certainty','prediction']]
+	fin['rightwrong']=np.where(fin.rel_type==fin.prediction, True, False)
+	corrects=fin[fin['rightwrong']==True]
+	wrongs=fin[fin['rightwrong']==False]
+	corrects.sort_values(['certainty'],ascending=False, inplace=True)
+	print'these are the ones the model got right; it got %d correct' %len(corrects)
+	print "here's how many gold label of each (correct)"
+	print corrects.rel_type.value_counts()
+	print "the model guesses correct with this average certainty (.5 max, 0 min)"
+	print corrects.certainty.mean()
+	corrects.to_csv(path+testname+'CorrectExs.csv')
+	wrongs.sort_values(['certainty'],ascending=False, inplace=True)
+	print 'these are the ones the model got wrong; it got %d wrong' %len(wrongs)
+	print "here's how many gold label of each (wrong)"
+	print wrongs.rel_type.value_counts()
+	print "the model guesses incorrectly with this average certainty (.5 max, 0 min)" 
+	print wrongs.certainty.mean()
+	wrongs.to_csv(path+testname+'WrongExs.csv')
+
+	if print_true:
+		print corrects, wrongs
+
+
+
+
+
 df3gramcommons=pd.DataFrame()
 
 path='/Users/Adina/git/Transitivity-Orthoforms/Results/'
+
 
 
 for i in xrange(1,7):
