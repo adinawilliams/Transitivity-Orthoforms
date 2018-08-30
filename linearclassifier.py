@@ -57,9 +57,9 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 	print features
 	dff=pd.DataFrame(data=forsavies, index=listALL, columns=features)
 	cc=dff.sum(axis=0)
-	nameywamey=re.findall(r'range=\(\d',str(vectorizer))[0][-1]
+	nameywamey=re.findall(r'range=\(1, \d',str(vectorizer))[0][-1]
 	print 'I am printing the counts for all your n-grams, be patient; this might take a hot min.'
-	cc.to_csv(save_loc  + name_modifier +nameywamey +'gramALLfeatureCounts')
+	cc.to_csv(save_loc  + name_modifier + nameywamey +'gramALLfeatureCounts')
 	print "your csv with counts for features has been created"
 	print 'it is saved here %s' %(save_loc + name_modifier+ nameywamey + 'gramALLfeatureCounts')
 
@@ -245,7 +245,8 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 			reldict={'rel':1, 'norel':0}
 			#return len(vectorizer.fit_transform(listotrain).toarray())
 
-			clf2 = LogisticRegression().fit(X_train,y_train) #fitting the Multinomial classifier
+			clf2 = LogisticRegression(penalty="l2", C=.09).fit(X_train,y_train) #fitting the Multinomial classifier, using l2 penalty following presets, using large C following Sam's suggestion
+			# 999 was too high, 99 was too high, 9 was too high, .9 seems ok, .09 seems good
 			score = clf2.score(X_train,y_train) 
 			predicted = clf2.predict(X_test)
 			probs = clf2.predict_proba(X_test)
@@ -473,6 +474,13 @@ quadgram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(4, 4))
 quintgram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(5, 5)) 
 liugram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(6, 6)) 
 
+unibigram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(1, 2)) # bigram vectorizer
+unibitrigram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(1, 3)) 
+unibitriquadgram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(1, 4)) 
+unibitriquadquintgram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(1, 5)) 
+unibitriquadquintliugram_vectorizer = CountVectorizer(analyzer='char_wb', ngram_range=(1, 6)) 
+
+
 maindata=rawdata[['target','rel_type']]
 
 verbs = pd.read_csv(verbs_path)
@@ -514,53 +522,41 @@ clear_datastructures()
 # Running Logistic Reg #
 ########################
 
+# these runs only have one type of n-gram size in them
+
+#clear_datastructures()
+#runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unigram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+# clear_datastructures()
+# runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=bigram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+# clear_datastructures()
+# runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=trigram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+# clear_datastructures()
+# runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quadgram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+# clear_datastructures()
+# runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quintgram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+# clear_datastructures()
+# runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=liugram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+
+#these runs have n-grams that include the gram size below them (i.e., trigrams, with bi and unis too)
 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unigram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unigram_vectorizer, name_modifier= 'Monomorphemic2Inclusive', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=bigram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unibigram_vectorizer, name_modifier= 'Monomorphemic2Inclusive', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=trigram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unibitrigram_vectorizer, name_modifier= 'Monomorphemic2Inclusive', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quadgram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unibitriquadgram_vectorizer, name_modifier= 'Monomorphemic2Inclusive', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=quintgram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unibitriquadquintgram_vectorizer, name_modifier= 'Monomorphemic2Inclusive', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
 clear_datastructures()
-runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=liugram_vectorizer, name_modifier= 'Monomorphemic2', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+runClassifier(maindata, coef_dict_logistic, probsdict, rankedlogfeats, save_loc=results_path, vectorizer=unibitriquadquintliugram_vectorizer, name_modifier= 'Monomorphemic2Inclusive', model='Logistic', print_testall=False, print_stats=True, print_sel=True, save_all_of_it=True, sel_numb=25, coeff_numb=25, k_num=5, tfidf_transform=False, tf_transform=False) 
+clear_datastructures()
 
 
-#listotrain=trainout['target'].tolist()
 
 #get_example_featweights_dict(listALL, x, coef_dict_logistic, vectorizer=unigram_vectorizer) 
 
 
 #runClassifier('Logistic', verbies, relnounies, bigram_vectorizer, coef_dict_logistic, False, True, True, 25, True, rankedlogfeats, 10). 
 # fix this
-
-
- 
-# TODO for tomorrow:
-
-
-
-# get all the numbers and put them in a table
-
-# check out the tfID thing (i.e., a way to scale for frequency)
-
-# check to make sure there are no repeat examples, words with same stem should all be in either train or test
-
-# they are the likelihood that a rel. noun will contain every bigram, convert parameter into weight feature pair tuple for rel and non; sort by weights
-
-# print out frequency of features in both sets
-
-# check the data for rel nouns in the no rel noun set...
-
-# write a function that prints weights for features that fire for each example, by example
-# we need a dict that takes example string as key and value is a list/tuple of features and weights
-
-
-
-# for naive bayes if we look at feature weights on their own, it's not super informative. probability of th|rel and th|nonrel
-# P(feature|rel)/P(feature|norel); will get rid of often-ness features
-
-# naive bayes breaks if, e.g., ther is really common, b/c whenever you see he it will be as part of th and er
