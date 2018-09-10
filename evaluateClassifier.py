@@ -61,13 +61,14 @@ def get_right_wrong(path, testname, goldlab_filename, print_true):
 	df.columns=['target','norelPred', 'relPred']
 	goldlab=pd.read_csv(path+goldlab_filename)
 	fin=pd.merge(goldlab,df, on='target')
-	fin=fin[['target', 'rel_type','relPred']]
+	fin=fin[['target', 'rel_type','relPred','norelPred']]
 	for i in fin.relPred:
 		cert.append(abs(float(0.5-i)))
 		if i>0.5:
 			pred.append('rel')
 		else:
 			pred.append('norel')
+
 	dfPredsOnly=fin[['relPred','norelPred']]
 	listoprobs= dfPredsOnly.values.tolist()
 	for j in range(len(listoprobs)):
@@ -76,38 +77,72 @@ def get_right_wrong(path, testname, goldlab_filename, print_true):
 	fin['entropy']=entropy
 	fin['certainty']=cert
 	fin['prediction']=pred
-	fin=fin[['target','rel_type','certainty','prediction']]
+	fin=fin[['target','rel_type','certainty','prediction','entropy']]
 	fin['rightwrong']=np.where(fin.rel_type==fin.prediction, True, False)
 	corrects=fin[fin['rightwrong']==True]
 	wrongs=fin[fin['rightwrong']==False]
 	corrects.sort_values(['certainty'],ascending=False, inplace=True)
 
+	print ''
+	print '#########################'
+	print '###### Correct ##########'
+	print '#########################'
+	print ''
 	print'these are the ones the model got right; it got %d correct' %len(corrects)
 	print "here's how many gold label of each (correct)"
 	print corrects.rel_type.value_counts()
 	correctrels=corrects[corrects['rel_type']=='rel']
 	correctnorels=corrects[corrects['rel_type']=='norel']
-	print "the model guesses correct with this average certainty (.5 max, 0 min)"
-	print corrects.certainty.mean()
-	print "the model guesses gold labeled relational words correct with this average certainty (.5 max, 0 min)"
-	print correctrels.certainty.mean()
-	print "the model guesses gold labeled non-relational words correct with this average certainty (.5 max, 0 min)"
-	print correctnorels.certainty.mean()
+
+	print "the model guesses correct with this average certainty (.5 max, 0 min): %f" %corrects.certainty.mean()
+	print "the model guesses correct with this standard deviation on certainty (.5 max, 0 min): %f" %corrects.certainty.std()
+	print ''
+	print "the model guesses gold labeled relational words correct with this average certainty (.5 max, 0 min): %f" %correctrels.certainty.mean()
+	print "the model guesses gold labeled relational words correct with this standard deviation on certainty (.5 max, 0 min): %f" %correctrels.certainty.std()
+	print ''
+	print "the model guesses gold labeled non-relational words correct with this average certainty (.5 max, 0 min): %f" %correctnorels.certainty.mean()
+	print "the model guesses gold labeled non-relational words correct with this standard deviation on certainty (.5 max, 0 min): %f" %correctnorels.certainty.std()
+	print ''
+	print "the model guesses correct with this average entropy: %f" %corrects.entropy.mean()
+	print "the model guesses correct with this standard deviation on entropy: %f" %corrects.entropy.std()
+	print ''
+	print "the model guesses gold labeled relational words correct with this average entropy: %f" %correctrels.entropy.mean()
+	print "the model guesses gold labeled relational words correct with this standard deviation on entropy: %f" %correctrels.entropy.std()
+	print ''
+	print "the model guesses gold labeled non-relational words correct with this average entropy: %f" %correctnorels.entropy.mean()
+	print "the model guesses gold labeled non-relational words correct with this standard deiation on entropy: %f" %correctnorels.entropy.std()
 	corrects.to_csv(path+testname+'CorrectExs.csv')
 
-
+	print ''
+	print '#########################'
+	print '###### Incorrect ########'
+	print '#########################'
+	print ''
 	wrongs.sort_values(['certainty'],ascending=False, inplace=True)
 	print 'these are the ones the model got wrong; it got %d wrong' %len(wrongs)
 	print "here's how many gold label of each (wrong)"
 	print wrongs.rel_type.value_counts()
 	wrongrels=wrongs[wrongs['rel_type']=='rel']
 	wrongnorels=wrongs[wrongs['rel_type']=='norel']
-	print "the model guesses incorrectly with this average certainty (.5 max, 0 min)" 
-	print wrongs.certainty.mean()
-	print "the model guesses gold labeled relational words incorrect with this average certainty (.5 max, 0 min)"
-	print wrongrels.certainty.mean()
-	print "the model guesses gold labeled non-relational words incorrect with this average certainty (.5 max, 0 min)"
-	print wrongnorels.certainty.mean()
+
+	print "the model guesses incorrectly with this average certainty (.5 max, 0 min): %f" %wrongs.certainty.mean()
+	print "the model guesses incorrectly with this standard deviation on certainty (.5 max, 0 min): %f" %wrongs.certainty.std()
+	print ''
+	print "the model guesses gold labeled relational words incorrectly with this average certainty (.5 max, 0 min): %f" %wrongrels.certainty.mean()
+	print "the model guesses gold labeled relational words incorrectly with this standard deviation on certainty (.5 max, 0 min): %f" %wrongrels.certainty.std()
+	print ''
+	print "the model guesses gold labeled non-relational words incorrectly with this average certainty (.5 max, 0 min): %f" %wrongnorels.certainty.mean()
+	print "the model guesses gold labeled non-relational words incorrectly with this standard deviation on certainty (.5 max, 0 min): %f" %wrongnorels.certainty.std()
+	print ''
+	print "the model guesses incorrectly with this average entropy: %f" %wrongs.entropy.mean()
+	print "the model guesses incorrectly with this standard deviation on entropy: %f" %wrongs.entropy.std()
+	print ''
+	print "the model guesses gold labeled relational words incorrectly with this average entropy: %f" %wrongrels.entropy.mean()
+	print "the model guesses gold labeled relational words incorrectly with this standard deviation on entropy: %f" %wrongrels.entropy.std()
+	print ''
+	print "the model guesses gold labeled non-relational words incorrectly with this average entropy: %f" %wrongnorels.entropy.mean()
+	print "the model guesses gold labeled non-relational words incorrectly with this standard deiation on entropy: %f" %wrongnorels.entropy.std()
+
 	wrongs.to_csv(path+testname+'WrongExs.csv')
 
 	if print_true:
