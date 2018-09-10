@@ -4,6 +4,7 @@ from numpy import copy
 import random, re, csv, glob, os
 import pandas as pd
 import matplotlib.pyplot as plt
+import scipy.stats
 
 from sklearn import *
 from sklearn.feature_extraction.text import CountVectorizer
@@ -55,6 +56,7 @@ def get_right_wrong(path, testname, goldlab_filename, print_true):
 	fin=[]
 	cert=[]
 	pred=[]
+	entropy=[]
 	df=pd.read_csv(path+testname +'.csv', header=-1)
 	df.columns=['target','norelPred', 'relPred']
 	goldlab=pd.read_csv(path+goldlab_filename)
@@ -66,6 +68,12 @@ def get_right_wrong(path, testname, goldlab_filename, print_true):
 			pred.append('rel')
 		else:
 			pred.append('norel')
+	dfPredsOnly=fin[['relPred','norelPred']]
+	listoprobs= dfPredsOnly.values.tolist()
+	for j in range(len(listoprobs)):
+		entrop=scipy.stats.entropy(listoprobs[j], base=2)
+		entropy.append(entrop)
+	fin['entropy']=entropy
 	fin['certainty']=cert
 	fin['prediction']=pred
 	fin=fin[['target','rel_type','certainty','prediction']]
@@ -73,18 +81,33 @@ def get_right_wrong(path, testname, goldlab_filename, print_true):
 	corrects=fin[fin['rightwrong']==True]
 	wrongs=fin[fin['rightwrong']==False]
 	corrects.sort_values(['certainty'],ascending=False, inplace=True)
+
 	print'these are the ones the model got right; it got %d correct' %len(corrects)
 	print "here's how many gold label of each (correct)"
 	print corrects.rel_type.value_counts()
+	correctrels=corrects[corrects['rel_type']=='rel']
+	correctnorels=corrects[corrects['rel_type']=='norel']
 	print "the model guesses correct with this average certainty (.5 max, 0 min)"
 	print corrects.certainty.mean()
+	print "the model guesses gold labeled relational words correct with this average certainty (.5 max, 0 min)"
+	print correctrels.certainty.mean()
+	print "the model guesses gold labeled non-relational words correct with this average certainty (.5 max, 0 min)"
+	print correctnorels.certainty.mean()
 	corrects.to_csv(path+testname+'CorrectExs.csv')
+
+
 	wrongs.sort_values(['certainty'],ascending=False, inplace=True)
 	print 'these are the ones the model got wrong; it got %d wrong' %len(wrongs)
 	print "here's how many gold label of each (wrong)"
 	print wrongs.rel_type.value_counts()
+	wrongrels=wrongs[wrongs['rel_type']=='rel']
+	wrongnorels=wrongs[wrongs['rel_type']=='norel']
 	print "the model guesses incorrectly with this average certainty (.5 max, 0 min)" 
 	print wrongs.certainty.mean()
+	print "the model guesses gold labeled relational words incorrect with this average certainty (.5 max, 0 min)"
+	print wrongrels.certainty.mean()
+	print "the model guesses gold labeled non-relational words incorrect with this average certainty (.5 max, 0 min)"
+	print wrongnorels.certainty.mean()
 	wrongs.to_csv(path+testname+'WrongExs.csv')
 
 	if print_true:
@@ -167,3 +190,18 @@ print '5gram feat weights loaded'
 featwe6=pd.read_csv(path+'logistic6gramRun5featweights')
 print '6gram feat weights loaded'
 print 'all feat weights loaded'
+
+
+
+ def perfOps(A):
+ 	m=len(A)
+ 	n=len(A[0])
+ 	B=[]
+ 	for i in xrange(len(A)):
+ 		B.append([0]*n)
+ 		for j in xrange(len(A[i])):
+ 			B[i][n-1-j]=A[i][j]
+ 			print n-1-j
+ 	return B
+
+
