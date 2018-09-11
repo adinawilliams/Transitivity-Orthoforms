@@ -37,6 +37,8 @@ from sklearn.feature_extraction.text import TfidfTransformer
 
 def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, name_modifier, model='Logistic', print_coeffdict=True, print_probs=True, print_testall=False, print_stats=False, print_sel=False, save_all_of_it=True, sel_numb=10, k_num=5, coeff_numb=10, tfidf_transform=False, tf_transform=False): 
 # two pandas df
+# data is where you will get your data from; should be .csv format. With two columns containing strings: target , rel_type. target refers to your work, rel_type refers to the binary coding 'rel' and 'norel'
+# probsdict starts as an empty dictionary that your probabilities will be written to; listofeats should be an empty list (same idea)
 # 'coef_dict' tells you where to write the dictionary that links features to their model coefficients; features get written to 'listofeats'
 # the name of a vectorizer, binary, trinary etc.; need to be externally defined
 # takes a string corresponding to model name: 'MultiNomial' or 'Logistic'
@@ -330,6 +332,13 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 				specificity = float(TN / float(TN + FP))
 				F1 = float(2 * float(precision * recall) / float(precision + recall))
 				print '%f false positives rate, ' %false_positive_rate #+ ' and %f is recall rate (rate of true positives)' %recall + ' and %f is precision (how precisely do we predict positives)' %precision
+
+				entropy = []
+				for value in probsdict.values():
+					entropy.append(scipy.stats.entropy(value,base=2))
+				avg_entropy=sum(entropy)/float(len(entropy))
+				print 'average entropy is %f' % avg_entropy
+
 				print metrics.classification_report(y_test, predicted)
 
 			if save_all_of_it:
@@ -350,6 +359,8 @@ def runClassifier(data, coef_dict, probsdict, listofeats, save_loc, vectorizer, 
 			dictoResults['recallRel'] = recall
 			dictoResults['DiffAcc'] = float(correct-avgnorel)
 			dictoResults['F1'] = F1
+			dictoResults['Average Entropy'] = avg_entropy
+			# dictoResults['entropy']=entropy 
 			fulldictOfResults[str(fold)]=dictoResults
 			with open(save_loc + nameywamey + 'gramResultsDict'+'.csv', 'wb') as csv_file:
 				writer = csv.writer(csv_file)
